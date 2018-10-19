@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2018-05-11" />
+<meta name="date" content="2018-10-19" />
 
 <title>vcr configuration</title>
 
@@ -1360,6 +1360,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -1484,7 +1487,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">vcr configuration</h1>
 <h4 class="author"><em>Scott Chamberlain</em></h4>
-<h4 class="date"><em>2018-05-11</em></h4>
+<h4 class="date"><em>2018-10-19</em></h4>
 
 </div>
 
@@ -1534,7 +1537,7 @@ div.tocify {
 <div id="match_requests_on" class="section level3">
 <h3>match_requests_on</h3>
 <p>Customize how <code>vcr</code> matches requests</p>
-<pre class="r"><code>vcr_configure(match_requests_on = c('query', 'headers'))</code></pre>
+<pre class="r"><code>vcr_configure(match_requests_on = c(&#39;query&#39;, &#39;headers&#39;))</code></pre>
 </div>
 <div id="allow_unused_http_interactions" class="section level3">
 <h3>allow_unused_http_interactions</h3>
@@ -1583,7 +1586,7 @@ div.tocify {
 <p>A named list of values to replace. Sometimes your package or script is working with sensitive tokens/keys, which you do not want to accidentally share with the world.</p>
 <p>Before recording (writing to a cassette) we do the replacement and then when reading from the cassette we do the reverse replacement to get back to the real data.</p>
 <pre class="r"><code>vcr_configure(
-  filter_sensitive_data = list(&quot;&lt;some_api_key&gt;&quot; = Sys.getenv('MY_API_KEY'))
+  filter_sensitive_data = list(&quot;&lt;some_api_key&gt;&quot; = Sys.getenv(&#39;MY_API_KEY&#39;))
 )</code></pre>
 <p>Before recording to disk, the env var <code>MY_API_KEY</code> is retrieved from your machine, and we find instances of it, and replace with <code>&lt;some_api_key&gt;</code>. When replaying to create the HTTP response object we put the real value of the env var back in place.</p>
 </div>

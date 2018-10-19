@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2018-05-11" />
+<meta name="date" content="2018-10-19" />
 
 <title>vcr introduction</title>
 
@@ -1360,6 +1360,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -1484,7 +1487,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">vcr introduction</h1>
 <h4 class="author"><em>Scott Chamberlain</em></h4>
-<h4 class="date"><em>2018-05-11</em></h4>
+<h4 class="date"><em>2018-10-19</em></h4>
 
 </div>
 
@@ -1494,7 +1497,7 @@ div.tocify {
 <p><code>vcr</code> is an R port of the Ruby gem <a href="https://github.com/vcr/vcr">VCR</a> (i.e., a translation, there’s no Ruby here :))</p>
 <p><code>vcr</code> helps you stub HTTP requests so you don’t have to repeat HTTP requests.</p>
 <p>The main use case is for unit tests, but you can use it outside of the unit test use case.</p>
-<p><code>vcr</code> currently only works with the <code>crul</code> package, but we plan to make it work with other http R packages.</p>
+<p><code>vcr</code> works with the <code>crul</code> and <code>httr</code> HTTP request packages; we’re working on support for <code>curl</code>.</p>
 <p>Check out the <a href="https://ropensci.github.io/http-testing-book/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
@@ -1528,13 +1531,13 @@ system.time(
     method: get
     uri: https://eu.httpbin.org/get
     body:
-      encoding: ''
-      string: ''
+      encoding: &#39;&#39;
+      string: &#39;&#39;
     headers:
       User-Agent: libcurl/7.54.0 r-curl/3.2 crul/0.5.2
   response:
     status:
-      status_code: '200'
+      status_code: &#39;200&#39;
       message: OK
       explanation: Request fulfilled, document follows
     headers:

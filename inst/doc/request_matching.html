@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2018-05-11" />
+<meta name="date" content="2018-10-19" />
 
 <title>request matching</title>
 
@@ -1360,6 +1360,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -1484,7 +1487,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">request matching</h1>
 <h4 class="author"><em>Scott Chamberlain</em></h4>
-<h4 class="date"><em>2018-05-11</em></h4>
+<h4 class="date"><em>2018-10-19</em></h4>
 
 </div>
 
@@ -1507,7 +1510,7 @@ div.tocify {
 <pre class="r"><code>use_cassette(name = &quot;foo_bar&quot;, {
     cli$post(&quot;post&quot;, body = list(a = 5))
   }, 
-  match_requests_on = c('method', 'headers', 'body')
+  match_requests_on = c(&#39;method&#39;, &#39;headers&#39;, &#39;body&#39;)
 )</code></pre>
 <div id="matching" class="section level2">
 <h2>Matching</h2>
@@ -1520,13 +1523,13 @@ cli &lt;- crul::HttpClient$new(&quot;https://httpbin.org/get&quot;,
 use_cassette(name = &quot;nothing_new&quot;, {
     one &lt;- cli$get()
   }, 
-  match_requests_on = 'headers'
+  match_requests_on = &#39;headers&#39;
 )
 cli$headers$foo &lt;- &quot;stuff&quot;
 use_cassette(name = &quot;nothing_new&quot;, {
     two &lt;- cli$get()
   }, 
-  match_requests_on = 'headers'
+  match_requests_on = &#39;headers&#39;
 )
 one$request_headers
 two$request_headers</code></pre>
