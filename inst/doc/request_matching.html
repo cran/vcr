@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2018-10-19" />
+<meta name="date" content="2019-01-13" />
 
 <title>request matching</title>
 
@@ -1366,6 +1366,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -1373,14 +1376,74 @@ button.code-folding-btn:focus {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -1487,14 +1550,14 @@ div.tocify {
 
 <h1 class="title toc-ignore">request matching</h1>
 <h4 class="author"><em>Scott Chamberlain</em></h4>
-<h4 class="date"><em>2018-10-19</em></h4>
+<h4 class="date"><em>2019-01-13</em></h4>
 
 </div>
 
 
 <div id="request-matching" class="section level1">
 <h1>Request matching</h1>
-<p>To match previously recorded requests, <code>vcr</code> has to try to match new HTTP reqeusts to a previously recorded one. By default, we match on HTTP method (e.g., <code>GET</code>) and URI (e.g., <code>http://foo.com</code>), following Ruby’s VCR gem.</p>
+<p>To match previously recorded requests, <code>vcr</code> has to try to match new HTTP requests to a previously recorded one. By default, we match on HTTP method (e.g., <code>GET</code>) and URI (e.g., <code>http://foo.com</code>), following Ruby’s VCR gem.</p>
 <p>You can customize how we match requests with one or more of the following options, some of which are on by default, some of which can be used together, and some alone.</p>
 <ul>
 <li><code>method</code>: Use the <strong>method</strong> request matcher to match requests on the HTTP method (i.e. GET, POST, PUT, DELETE, etc). You will generally want to use this matcher. The <strong>method</strong> matcher is used (along with the <strong>uri</strong> matcher) by default if you do not specify how requests should match.</li>
@@ -1510,7 +1573,7 @@ div.tocify {
 <pre class="r"><code>use_cassette(name = &quot;foo_bar&quot;, {
     cli$post(&quot;post&quot;, body = list(a = 5))
   }, 
-  match_requests_on = c(&#39;method&#39;, &#39;headers&#39;, &#39;body&#39;)
+  match_requests_on = c('method', 'headers', 'body')
 )</code></pre>
 <div id="matching" class="section level2">
 <h2>Matching</h2>
@@ -1523,13 +1586,13 @@ cli &lt;- crul::HttpClient$new(&quot;https://httpbin.org/get&quot;,
 use_cassette(name = &quot;nothing_new&quot;, {
     one &lt;- cli$get()
   }, 
-  match_requests_on = &#39;headers&#39;
+  match_requests_on = 'headers'
 )
 cli$headers$foo &lt;- &quot;stuff&quot;
 use_cassette(name = &quot;nothing_new&quot;, {
     two &lt;- cli$get()
   }, 
-  match_requests_on = &#39;headers&#39;
+  match_requests_on = 'headers'
 )
 one$request_headers
 two$request_headers</code></pre>

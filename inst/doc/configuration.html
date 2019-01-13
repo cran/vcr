@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2018-10-19" />
+<meta name="date" content="2019-01-13" />
 
 <title>vcr configuration</title>
 
@@ -1366,6 +1366,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -1373,14 +1376,74 @@ button.code-folding-btn:focus {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -1487,7 +1550,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">vcr configuration</h1>
 <h4 class="author"><em>Scott Chamberlain</em></h4>
-<h4 class="date"><em>2018-10-19</em></h4>
+<h4 class="date"><em>2019-01-13</em></h4>
 
 </div>
 
@@ -1537,7 +1600,7 @@ div.tocify {
 <div id="match_requests_on" class="section level3">
 <h3>match_requests_on</h3>
 <p>Customize how <code>vcr</code> matches requests</p>
-<pre class="r"><code>vcr_configure(match_requests_on = c(&#39;query&#39;, &#39;headers&#39;))</code></pre>
+<pre class="r"><code>vcr_configure(match_requests_on = c('query', 'headers'))</code></pre>
 </div>
 <div id="allow_unused_http_interactions" class="section level3">
 <h3>allow_unused_http_interactions</h3>
@@ -1578,7 +1641,7 @@ div.tocify {
 </div>
 <div id="preserve_exact_body_bytes" class="section level3">
 <h3>preserve_exact_body_bytes</h3>
-<p>Some HTTP servers are not well-behaved and respond with invalid data. Set <code>preserve_exact_body_bytes</code> to <code>TRUE</code> to base64 encode the result body in order to preserve the bytes exactly as-is. <code>vcr</code> does not do this by default, since base64-encoding the string removes the human readibility of the cassette.</p>
+<p>Some HTTP servers are not well-behaved and respond with invalid data. Set <code>preserve_exact_body_bytes</code> to <code>TRUE</code> to base64 encode the result body in order to preserve the bytes exactly as-is. <code>vcr</code> does not do this by default, since base64-encoding the string removes the human readability of the cassette.</p>
 <pre class="r"><code>vcr_configure(preserve_exact_body_bytes = TRUE)</code></pre>
 </div>
 <div id="filter_sensitive_data" class="section level3">
@@ -1586,7 +1649,7 @@ div.tocify {
 <p>A named list of values to replace. Sometimes your package or script is working with sensitive tokens/keys, which you do not want to accidentally share with the world.</p>
 <p>Before recording (writing to a cassette) we do the replacement and then when reading from the cassette we do the reverse replacement to get back to the real data.</p>
 <pre class="r"><code>vcr_configure(
-  filter_sensitive_data = list(&quot;&lt;some_api_key&gt;&quot; = Sys.getenv(&#39;MY_API_KEY&#39;))
+  filter_sensitive_data = list(&quot;&lt;some_api_key&gt;&quot; = Sys.getenv('MY_API_KEY'))
 )</code></pre>
 <p>Before recording to disk, the env var <code>MY_API_KEY</code> is retrieved from your machine, and we find instances of it, and replace with <code>&lt;some_api_key&gt;</code>. When replaying to create the HTTP response object we put the real value of the env var back in place.</p>
 </div>

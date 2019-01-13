@@ -51,9 +51,18 @@
 #' but you don't get an object back
 #'
 #' @section Cassettes on disk:
-#' Note that _"eject"_ only means that the R sesion cassette is no longer
+#' Note that _"eject"_ only means that the R session cassette is no longer
 #' in use. If any interactions were recorded to disk, then there is a file
 #' on disk with those interactions.
+#' 
+#' @section Using with tests (specifically \pkg{testthat}): 
+#' If you wrap your `test_that()` block inside your `use_cassette()` 
+#' block you'll get the correct line numbers from `testthat` when there 
+#' are errors/warnings/etc. However, if you wrap the `use_cassette()` 
+#' block inside your  `test_that()` block, on errors/etc. you'll only 
+#' get the line number that that `use_cassette()` block starts on, 
+#' which is only identifies the code block but not the offending 
+#' line itself.
 #'
 #' @return an object of class `Cassette`
 #'
