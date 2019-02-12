@@ -88,13 +88,18 @@ on disk with those interactions.
 
 \section{Using with tests (specifically \pkg{testthat})}{
 
-If you wrap your \code{test_that()} block inside your \code{use_cassette()}
-block you'll get the correct line numbers from \code{testthat} when there
-are errors/warnings/etc. However, if you wrap the \code{use_cassette()}
-block inside your  \code{test_that()} block, on errors/etc. you'll only
-get the line number that that \code{use_cassette()} block starts on,
-which is only identifies the code block but not the offending
-line itself.
+There's a few ways to get correct line numbers for failed tests and
+one way to not get correct line numbers:
+
+\emph{Correct}: Either wrap your \code{test_that()} block inside your \code{use_cassette()}
+block, OR if you put your \code{use_cassette()} block inside your \code{test_that()}
+block put your \code{testthat} expectations outside of the \code{use_cassette()}
+block.
+
+\emph{Incorrect}: By wrapping the \code{use_cassette()} block inside your
+\code{test_that()} block with your \pkg{testthat} expectations inside the
+\code{use_cassette()} block, you'll only get the line number that the
+\code{use_cassette()} block starts on.
 }
 
 \examples{
@@ -135,6 +140,20 @@ use_cassette(name = "catfact456", {
   res <- GET("https://catfact.ninja/fact")
 })
 
+# record mode: none
+library(crul)
+vcr_configure(dir = tempdir())
+
+## make a connection first
+conn <- crul::HttpClient$new("https://eu.httpbin.org")
+## this errors because 'none' disallows any new requests
+# use_cassette("none_eg", (res2 <- conn$get("get")), record = "none")
+## first use record mode 'once' to record to a cassette
+one <- use_cassette("none_eg", (res <- conn$get("get")), record = "once")
+one; res
+## then use record mode 'none' to see it's behavior
+two <- use_cassette("none_eg", (res2 <- conn$get("get")), record = "none")
+two; res2
 }
 }
 \seealso{

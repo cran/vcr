@@ -4,8 +4,9 @@ vcr
 
 
 [![cran checks](https://cranchecks.info/badges/worst/vcr)](https://cranchecks.info/pkgs/vcr)
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Build Status](https://travis-ci.org/ropensci/vcr.svg)](https://travis-ci.org/ropensci/vcr)
+[![Build status](https://ci.appveyor.com/api/projects/status/6sewc0t3bhdg5opo?svg=true)](https://ci.appveyor.com/project/sckott/vcr)
 [![codecov](https://codecov.io/gh/ropensci/vcr/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/vcr)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/vcr)](https://github.com/metacran/cranlogs.app)
 [![cran version](https://www.r-pkg.org/badges/version/vcr)](https://cran.r-project.org/package=vcr)
@@ -37,7 +38,7 @@ system.time(
   })
 )
 #>    user  system elapsed 
-#>   0.168   0.023   1.175
+#>   0.182   0.026   1.302
 ```
 
 The request gets recorded, and all subsequent requests of the same form used the cached HTTP response, and so are much faster
@@ -50,7 +51,7 @@ system.time(
   })
 )
 #>    user  system elapsed 
-#>   0.080   0.004   0.085
+#>   0.079   0.003   0.084
 ```
 
 
@@ -169,9 +170,23 @@ vcr::use_cassette("rl_citation", {
 })
 ```
 
-**Important**: If you wrap your `test_that()` block inside your `use_cassette()` block you'll get the correct
-line numbers from `testthat` when there are errors/warnings/etc. However, if you wrap the `use_cassette()` block inside your  `test_that()` block, on errors/etc. you'll only get the line number that that `use_cassette()` block starts on, 
-which is only identifies the code block but not the offending line itself.
+OR put the `vcr::use_cassette()` block on the inside, but put `testthat` expectations outside of 
+the `vcr::use_cassette()` block:
+
+```r
+library(testthat)
+test_that("my test", {
+  vcr::use_cassette("rl_citation", {
+    aa <- rl_citation()
+  })
+
+  expect_is(aa, "character")
+  expect_match(aa, "IUCN")
+  expect_match(aa, "www.iucnredlist.org")
+})
+```
+
+Don't wrap the `use_cassette()` block inside your  `test_that()` block with `testthat` expectations inside the `use_cassette()` block, as you'll only get the line number that the `use_cassette()` block starts on on failures.
 
 * When running tests or checks of your whole package, note that some users have found different results with 
 `devtools::check()` vs. `devtools::test()`. It's not clear why this would make a difference. Do let us know 
