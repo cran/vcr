@@ -1,10 +1,29 @@
+vcr 0.3.0
+=========
+
+### NEW FEATURES
+
+* new internal method `up_to_date_interactions` in `cassette_class` now allows filtering cassettes by user specified date (#96) (#104)
+* re-recording now works - see new `use_casette()` parameters `re_record_interval` and `clean_outdated_http_interactions`; you can now set a re-record interval (in seconds) so that you can for example always re-record cassettes if you don't want cassettes to be more than X days old; depends on new internal method `up_to_date_interactions` (#104) (#105)
+
+### MINOR IMPROVEMENTS
+
+* fix link to HTTP Testing Book: ropensci -> ropenscilabs (#100)
+* add new section to HTTP Testing Book on "vcr enabled testing" with sub-sections on check vs. test, your package on CRAN, and your package on continuous integration sites (#102)
+
+### BUG FIXES
+
+* fix request body matching - partly through fixes to `webmockr` package (requires v0.4 or greater); more generally, makes single type request matching (e.g., just HTTP method, or just URL) possible, it was not working before, but is now working; added examples of doing single type matching (#70) (#76) (#108)
+* fixed type in `cassette_class` where typo lead to not setting headers correctly in the `webmockr::wi_th()` call (#107)
+
+
 vcr 0.2.6
 =========
 
 ## NEW FEATURES
 
 * gains function `use_vcr()` to setup `vcr` for your package. This requires 3 pkgs all in Suggests; so are not required if you don't need to use `use_vcr()` (#52) (#95) thanks @maelle for the feedback!
-* `vcr` actually supports all four recording modes: `none`, `once`, `new_episodes`, and `all`. `once` is what's used by default. See `?recording` for description of the recording modes. For now [the test file test-ause_cassette_record_modes.R](https://github.com/ropensci/vcr/blob/master/tests/testthat/test-ause_cassette_record_modes.R) gives some examples and what to expect for each record mode; in the future the http testing book will have much more information in the _Record modes_ chapter <https://ropensci.github.io/http-testing-book/record-modes.html> ([commit](https://github.com/ropensci/vcr/commit/04aa5f784b18308d8f62d1b6b0be2f3e140f2a5a))
+* `vcr` actually supports all four recording modes: `none`, `once`, `new_episodes`, and `all`. `once` is what's used by default. See `?recording` for description of the recording modes. For now [the test file test-ause_cassette_record_modes.R](https://github.com/ropensci/vcr/blob/master/tests/testthat/test-ause_cassette_record_modes.R) gives some examples and what to expect for each record mode; in the future the http testing book will have much more information in the _Record modes_ chapter <https://ropenscilabs.github.io/http-testing-book/record-modes.html> ([commit](https://github.com/ropensci/vcr/commit/04aa5f784b18308d8f62d1b6b0be2f3e140f2a5a))
 
 ### MINOR IMPROVEMENTS
 
