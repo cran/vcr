@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2019-08-20" />
+<meta name="date" content="2019-12-07" />
 
 <title>request matching</title>
 
@@ -1357,7 +1356,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -1419,6 +1417,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -1447,6 +1446,12 @@ summary {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -1519,7 +1524,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">request matching</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2019-08-20</h4>
+<h4 class="date">2019-12-07</h4>
 
 </div>
 
@@ -1542,7 +1547,7 @@ div.tocify {
 <pre class="r"><code>use_cassette(name = &quot;foo_bar&quot;, {
     cli$post(&quot;post&quot;, body = list(a = 5))
   }, 
-  match_requests_on = c('method', 'headers', 'body')
+  match_requests_on = c(&#39;method&#39;, &#39;headers&#39;, &#39;body&#39;)
 )</code></pre>
 <div id="matching" class="section level2">
 <h2>Matching</h2>
@@ -1555,13 +1560,13 @@ cli &lt;- crul::HttpClient$new(&quot;https://httpbin.org/get&quot;,
 use_cassette(name = &quot;nothing_new&quot;, {
     one &lt;- cli$get()
   }, 
-  match_requests_on = 'headers'
+  match_requests_on = &#39;headers&#39;
 )
 cli$headers$foo &lt;- &quot;stuff&quot;
 use_cassette(name = &quot;nothing_new&quot;, {
     two &lt;- cli$get()
   }, 
-  match_requests_on = 'headers'
+  match_requests_on = &#39;headers&#39;
 )
 one$request_headers
 two$request_headers</code></pre>
@@ -1569,7 +1574,7 @@ two$request_headers</code></pre>
 </div>
 <div id="more-documentation" class="section level2">
 <h2>More documentation</h2>
-<p>Check out the <a href="https://ropenscilabs.github.io/http-testing-book/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
+<p>Check out the <a href="https://books.ropensci.org/http-testing/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
 </div>
 </div>
 

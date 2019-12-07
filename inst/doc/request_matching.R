@@ -1,4 +1,4 @@
-## ----echo=FALSE----------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 knitr::opts_chunk$set(
     comment = "#>",
     collapse = TRUE,
@@ -6,26 +6,26 @@ knitr::opts_chunk$set(
     message = FALSE
 )
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(vcr)
 
-## ----echo=FALSE, eval=FALSE----------------------------------------------
+## ----echo=FALSE, eval=FALSE---------------------------------------------------
 #  unlink(file.path(cassette_path(), "foo_bar.yml"))
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  use_cassette(name = "foo_bar", {
 #      cli$post("post", body = list(a = 5))
 #    },
 #    match_requests_on = c('method', 'headers', 'body')
 #  )
 
-## ----echo=FALSE, eval=FALSE----------------------------------------------
+## ----echo=FALSE, eval=FALSE---------------------------------------------------
 #  unlink(file.path(cassette_path(), "foo_bar.yml"))
 
-## ----echo=FALSE, eval=FALSE----------------------------------------------
+## ----echo=FALSE, eval=FALSE---------------------------------------------------
 #  unlink(file.path(cassette_path(), "nothing_new.yml"))
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  library(crul)
 #  library(vcr)
 #  cli <- crul::HttpClient$new("https://httpbin.org/get",
@@ -44,6 +44,6 @@ library(vcr)
 #  one$request_headers
 #  two$request_headers
 
-## ----echo=FALSE, eval=FALSE----------------------------------------------
+## ----echo=FALSE, eval=FALSE---------------------------------------------------
 #  unlink(file.path(cassette_path(), "nothing_new.yml"))
 

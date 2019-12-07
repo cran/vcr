@@ -13,15 +13,11 @@
 #' google.com. These hosts are ignored and real HTTP requests allowed to go
 #' through
 #' @param ignore_localhost (logical) Default: `FALSE`
-#' @param ignore_request List of requests to ignore
+#' @param ignore_request List of requests to ignore. NOT USED RIGHT NOW, sorry
 #' @param uri_parser the uri parser, default: [crul::url_parse()]
 #' @param preserve_exact_body_bytes (logical) preserve exact body bytes for
 #' @param turned_off (logical) VCR is turned on by default. Default:
 #' `FALSE`
-#' @param ignore_cassettes (logical) Ignore cassettes. You can set this to
-#' `TRUE` when you don't have a cassette in use but still want to make
-#' HTTP requests. Otherwise, you can't make requests unless a cassette is in
-#' use. Default: `FALSE`
 #' @param re_record_interval (numeric) When given, the cassette will be
 #' re-recorded at the given interval, in seconds.
 #' @param clean_outdated_http_interactions (logical) Should outdated interactions
@@ -49,12 +45,20 @@
 #' to the real data. Before record replacement happens in internal
 #' function `write_interactions()`, while before playback replacement
 #' happens in internal function `YAML$deserialize_path()`
+#' 
+#' @param write_disk_path (character) path to write files to 
+#' for any requests that write responses to disk. by default this parameter
+#' is `NULL`. For testing a package, you'll probably want this path to 
+#' be in your `tests/` directory, perhaps next to your cassettes
+#' directory, e.g., where your cassettes are in `tests/fixtures`, your
+#' files from requests that write to disk are in `tests/files`
 #'
 #' @examples
 #' vcr_configure(dir = tempdir())
 #' vcr_configure(dir = tempdir(), record = "all")
 #' vcr_configuration()
 #' vcr_config_defaults()
+#' vcr_configure(tempdir(), ignore_hosts = "google.com")
 #' vcr_configure(tempdir(), ignore_localhost = TRUE)
 #'
 #' # logging
@@ -88,7 +92,6 @@ vcr_configure <- function(
   uri_parser = "crul::url_parse",
   preserve_exact_body_bytes = FALSE,
   turned_off = FALSE,
-  ignore_cassettes = FALSE,
   re_record_interval = NULL,
   clean_outdated_http_interactions = NULL,
   allow_http_connections_when_no_cassette = FALSE,
@@ -96,7 +99,8 @@ vcr_configure <- function(
   linked_context = NULL,
   log = FALSE,
   log_opts = list(file = "vcr.log", log_prefix = "Cassette", date = TRUE),
-  filter_sensitive_data = NULL
+  filter_sensitive_data = NULL,
+  write_disk_path = NULL
   ) {
 
   assert(log, "logical")
@@ -115,11 +119,20 @@ vcr_configure <- function(
     }
   }
 
+  assert(ignore_hosts, "character")
+  assert(ignore_localhost, "logical")
+  if (!is.null(ignore_hosts) || ignore_localhost) {
+    x <- RequestIgnorer$new()
+    if (!is.null(ignore_hosts)) x$ignore_hosts(hosts = ignore_hosts)
+    if (ignore_localhost) x$ignore_localhost()
+  }
+
   # add missing log options
   log_opts <- merge_list(log_opts,
     list(file = "vcr.log", log_prefix = "Cassette", date = TRUE))
 
   calls <- as.list(environment(), all.names = TRUE)
+  calls$x <- NULL
   for (i in seq_along(calls)) {
     vcr_c[[names(calls)[i]]] <- calls[[i]]
   }
@@ -153,7 +166,6 @@ VCRConfig <- R6::R6Class(
     uri_parser = NULL,
     preserve_exact_body_bytes = NULL,
     turned_off = NULL,
-    ignore_cassettes = NULL,
     re_record_interval = NULL,
     clean_outdated_http_interactions = NULL,
     allow_http_connections_when_no_cassette = NULL,
@@ -162,6 +174,7 @@ VCRConfig <- R6::R6Class(
     log = NULL,
     log_opts = NULL,
     filter_sensitive_data = NULL,
+    write_disk_path = NULL,
 
     print = function(...) {
       cat("<vcr configuration>", sep = "\n")
@@ -169,10 +182,14 @@ VCRConfig <- R6::R6Class(
       cat(paste0("  Record: ", self$record), sep = "\n")
       cat(paste0("  URI Parser: ", self$uri_parser), sep = "\n")
       cat(paste0("  Match Requests on: ",
-                 paste0(self$match_requests_on, collapse = ", ")), sep = "\n")
-      cat(paste0("  Preserve Bytes?: ", self$preserve_exact_body_bytes), sep = "\n")
+        pastec(self$match_requests_on)), sep = "\n")
+      cat(paste0("  Preserve Bytes?: ",
+        self$preserve_exact_body_bytes), sep = "\n")
       logloc <- if (self$log) sprintf(" (%s)", self$log_opts$file) else ""
       cat(paste0("  Logging?: ", self$log, logloc), sep = "\n")
+      cat(paste0("  ignored hosts: ", pastec(self$ignore_hosts)), sep = "\n")
+      cat(paste0("  ignore localhost?: ", self$ignore_localhost), sep = "\n")
+      cat(paste0("  Write disk path: ", self$write_disk_path), sep = "\n")
       invisible(self)
     },
 
@@ -181,6 +198,8 @@ VCRConfig <- R6::R6Class(
     }
   )
 )
+
+pastec <- function(x) paste0(x, collapse = ", ")
 
 vcr_default_config_vars <- list(
   dir = ".",
@@ -195,7 +214,6 @@ vcr_default_config_vars <- list(
   uri_parser = "crul::url_parse",
   preserve_exact_body_bytes = FALSE,
   turned_off = FALSE,
-  ignore_cassettes = FALSE,
   re_record_interval = NULL,
   clean_outdated_http_interactions = NULL,
   allow_http_connections_when_no_cassette = FALSE,
@@ -203,5 +221,6 @@ vcr_default_config_vars <- list(
   linked_context = NULL,
   log = FALSE,
   log_opts = list(file = "vcr.log", log_prefix = "Cassette"),
-  filter_sensitive_data = NULL
+  filter_sensitive_data = NULL,
+  write_disk_path = NULL
 )

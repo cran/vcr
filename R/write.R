@@ -1,8 +1,3 @@
-write_cassette <- function(cassette, result){
-  file <- get_cassette_data_paths()[cassette$name][[1]]
-  write_yaml(result, file)
-}
-
 write_yaml <- function(x, file, bytes) {
   write_header(file)
   lapply(x, write_interactions, file = file, bytes = bytes)
@@ -43,8 +38,12 @@ write_interactions <- function(x, file, bytes) {
   assert(x, c("list", "HTTPInteraction"))
   assert(file, "character")
 
-  body <- if (bytes) {
-    base64enc::base64encode(charToRaw(get_body(x$response$body)))
+  if (is.raw(x$response$body)) bytes <- TRUE
+
+  body <- if (bytes || is.raw(x$response$body)) {
+    bd <- get_body(x$response$body)
+    if (!is.raw(bd)) bd <- charToRaw(bd)
+    base64enc::base64encode(bd)
   } else {
     get_body(x$response$body)
   }
@@ -58,7 +57,9 @@ write_interactions <- function(x, file, bytes) {
   # if (inherits(body_nchar, "error")) {
   #   body_nchar <- nchar(body)
   # }
+  if (length(body) == 0 || !nzchar(body)) body <- ""
 
+  # cat(sprintf("x$response$body: %s, %s", class(x$response$body), length(x$response$body)), sep = "\n")
   tmp <- yaml::as.yaml(
     list(
       list(
@@ -76,6 +77,7 @@ write_interactions <- function(x, file, bytes) {
           headers = dedup_keys(x$response$headers),
           body = list(
             encoding = encoding_guess(x$response$body, bytes),
+            file = x$response$disk,
             # handle large bodies
             string = body
             # string = if (body_nchar < 1000000L) {
@@ -112,28 +114,13 @@ pkg_versions <- function() {
   )
 }
 
-forwrite <- function(name, x, file){
-  cf(name, file)
-  for (i in seq_along(x)) {
-    cf(sprintf("  %s: '%s'", names(x[i]), x[[i]]), file)
-  }
-}
-
-cf <- function(x, f){
-  cat(paste0("   ", x), sep = "\n", file = f, append = TRUE)
-}
-
 get_body <- function(x) {
   if (is.null(x)) '' else x
 }
 
-strex <- function(string, pattern) {
-  regmatches(string, regexpr(pattern, string))
-}
-
 encoding_guess <- function(x, bytes = FALSE, force_guess = FALSE) {
   if (bytes && !force_guess) return("ASCII-8BIT")
-  enc <- Encoding(x)
+  enc <- try_encoding(x)
   if (enc == "unknown") {
     message("encoding couldn't be detected; assuming UTF-8")
   }

@@ -33,6 +33,10 @@ included
 HTTP status code and response body are included in the
 response summary. The response body is truncated to a
 max of 80 characters
+
+In \code{response_summary()} we use \link{gsub} with \code{useBytes=TRUE} to avoid
+problems soemtimes seen with multibyte strings - this shouldn't affect
+your data/etc. as this is only for printing a summary of the response
 }
 \examples{
 # request
@@ -59,9 +63,16 @@ headers <- list(
   connection = "keep-alive",
   date = "Tue, 24 Apr 2018 04:46:56 GMT"
 )
-response_body <- "{\\"args\\": {\\"q\\": \\"stuff\\"}, \\"headers\\": {\\"Accept\\": \\"application/json\\"}}\\n"
+response_body <- 
+"{\"args\": {\"q\": \"stuff\"}, \"headers\": {\"Accept\": \"text/html\"}}\n"
 (x <- VcrResponse$new(status, headers,
    response_body, "HTTP/1.1 200 OK"))
 response_summary(x)
+
+## with binary body
+# path <- "tests/testthat/png_eg.rda"
+# load(path)
+# (x <- VcrResponse$new(status, headers, png_eg, "HTTP/1.1 200 OK"))
+# response_summary(x)
 }
 \keyword{internal}

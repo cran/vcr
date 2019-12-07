@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2019-08-20" />
+<meta name="date" content="2019-12-07" />
 
 <title>vcr configuration</title>
 
@@ -1357,7 +1356,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -1419,6 +1417,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -1447,6 +1446,12 @@ summary {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -1519,7 +1524,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">vcr configuration</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2019-08-20</h4>
+<h4 class="date">2019-12-07</h4>
 
 </div>
 
@@ -1569,7 +1574,7 @@ div.tocify {
 <div id="match_requests_on" class="section level3">
 <h3>match_requests_on</h3>
 <p>Customize how <code>vcr</code> matches requests</p>
-<pre class="r"><code>vcr_configure(match_requests_on = c('query', 'headers'))</code></pre>
+<pre class="r"><code>vcr_configure(match_requests_on = c(&#39;query&#39;, &#39;headers&#39;))</code></pre>
 </div>
 <div id="allow_unused_http_interactions" class="section level3">
 <h3>allow_unused_http_interactions</h3>
@@ -1587,20 +1592,25 @@ div.tocify {
 <p>Which persister to use. Right now only option is “FileSystem”</p>
 <pre class="r"><code>vcr_configure(persist_with = &quot;FileSystem&quot;)</code></pre>
 </div>
-<div id="ignore_hosts" class="section level3">
-<h3>ignore_hosts</h3>
+<div id="ignoring-some-requests" class="section level3">
+<h3>ignoring some requests</h3>
+<p><strong>ignore_hosts</strong></p>
 <p>Specify particular hosts to ignore. By ignore, we mean that real HTTP requests to the ignored host will be allowed to occur, while all others will not.</p>
 <pre class="r"><code>vcr_configure(ignore_hosts = &quot;google.com&quot;)</code></pre>
-</div>
-<div id="ignore_localhost" class="section level3">
-<h3>ignore_localhost</h3>
+<p><strong>ignore_localhost</strong></p>
 <p>Ignore all localhost requests</p>
 <pre class="r"><code>vcr_configure(ignore_localhost = TRUE)</code></pre>
-</div>
-<div id="ignore_request" class="section level3">
-<h3>ignore_request</h3>
-<p>Ignore any request for which function <code>x</code> is true</p>
-<pre class="r"><code>vcr_configure(ignore_request = function(x) x == 5)</code></pre>
+<p><strong>ignore_request</strong></p>
+<p>THIS DOESN’T WORK YET</p>
+<p><strong>How to ignore requests</strong></p>
+<p>For ignoring requests, you can for example, have real http requests go through (ignored by <code>vcr</code>) while other requests are handled by <code>vcr</code>. For example, let’s say you want requests to <code>google.com</code> to be ignored:</p>
+<pre class="r"><code>vcr_configure(ignore_hosts = &quot;google.com&quot;)
+use_cassette(&quot;foo_bar&quot;, {
+  crul::HttpClient$new(&quot;https://httpbin.org/get&quot;)$get()
+  crul::HttpClient$new(&quot;https://google.com&quot;)$get()
+})</code></pre>
+<p>The request to httpbin.org will be handled by <code>vcr</code>, a cassette created for the request/response to that url, while the google.com request will be ignored and not cached at all.</p>
+<p>Note: ignoring requests only works for the <code>crul</code> package for now; it should work for <code>httr</code> in a later <code>vcr</code> version.</p>
 </div>
 <div id="uri_parse" class="section level3">
 <h3>uri_parse</h3>
@@ -1618,14 +1628,14 @@ div.tocify {
 <p>A named list of values to replace. Sometimes your package or script is working with sensitive tokens/keys, which you do not want to accidentally share with the world.</p>
 <p>Before recording (writing to a cassette) we do the replacement and then when reading from the cassette we do the reverse replacement to get back to the real data.</p>
 <pre class="r"><code>vcr_configure(
-  filter_sensitive_data = list(&quot;&lt;some_api_key&gt;&quot; = Sys.getenv('MY_API_KEY'))
+  filter_sensitive_data = list(&quot;&lt;some_api_key&gt;&quot; = Sys.getenv(&#39;MY_API_KEY&#39;))
 )</code></pre>
 <p>Before recording to disk, the env var <code>MY_API_KEY</code> is retrieved from your machine, and we find instances of it, and replace with <code>&lt;some_api_key&gt;</code>. When replaying to create the HTTP response object we put the real value of the env var back in place.</p>
 </div>
 </div>
 <div id="more-documentation" class="section level2">
 <h2>More documentation</h2>
-<p>Check out the <a href="https://ropenscilabs.github.io/http-testing-book/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
+<p>Check out the <a href="https://books.ropensci.org/http-testing/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
 </div>
 </div>
 

@@ -1,24 +1,6 @@
-#' The YAML serializer
-#'
+#' @title The YAML serializer
+#' @description class with methods for serializing via the \pkg{yaml} package
 #' @keywords internal
-#' @param file_extension (character) A file extension
-#' @param path (character) full path to the yaml file
-#' @param string (character) path string
-#' @details
-#' \strong{Methods}
-#'   \describe{
-#'     \item{\code{serialize(x)}}{
-#'       Serializes the given hash using internal fxn write_yaml
-#'     }
-#'     \item{\code{deserialize_string(string = NULL)}}{
-#'       Deserializes the given string using yaml::yaml.load
-#'     }
-#'     \item{\code{deserialize_path()}}{
-#'       Deserializes the given string using yaml::yaml.load_file
-#'     }
-#'   }
-#' @format NULL
-#' @usage NULL
 #' @examples \dontrun{
 #' (yy <- YAML$new(path = "stuff2"))
 #' fun <- yy$serialize()
@@ -30,10 +12,19 @@
 #' }
 YAML <- R6::R6Class("YAML",
   public = list(
+    #' @field file_extension (character) A file extension
     file_extension = ".yml",
+    #' @field path (character) full path to the yaml file
     path = NULL,
+    #' @field string (character) path string
     string = NULL,
 
+    #' @description Create a new YAML object
+    #' @param file_extension (character) A file extension
+    #' @param path (character) path to the cassette, excluding the cassette
+    #' directory and the file extension. only use if not passing a string
+    #' @param string (character) path string. only use if not passing a path
+    #' @return A new `YAML` object
     initialize = function(file_extension = ".yml", path = NULL, string = NULL) {
       self$file_extension <- file_extension
       if (is.null(path)) {
@@ -44,32 +35,30 @@ YAML <- R6::R6Class("YAML",
       self$string <- string
     },
 
-    # Serializes the given hash using internal fxn write_yaml
+    #' @description Serializes the given hash using internal fxn write_yaml
+    #' @param x (list) the object to serialize
+    #' @param path (character) the file path
+    #' @param bytes (logical) whether to preserve exact body bytes or not
+    #' @return (character) the YAML string to write to disk
     serialize = function(x, path, bytes) {
-      # @param [list] x the object to serialize
-      # @param [character] the file path
-      # @param [logical] whether to preserve exact body bytes or not
-      # @return [String] the YAML string to write to disk
       #write_yaml(x, self$path)
       function(x, path, bytes) {
         write_yaml(x, path, bytes)
       }
     },
 
-    # Deserializes the given string using yaml::yaml.load
+    #' @description Deserializes the given string using yaml::yaml.load
+    #' @param string (character) the YAML string
+    #' @return (list) the deserialized object, an R list
     deserialize_string = function(string = NULL) {
-      # @param [String] string the YAML string
-      # @return [Hash] the deserialized object, an R list
-      if (is.null(self$string)) str <- string else self$string
+      str <- if (is.null(self$string)) string else self$string
       if (is.null(str)) stop("Must pass a string", call. = FALSE)
       yaml::yaml.load(str)
     },
 
-    # Deserializes the given string using yaml::yaml.load_file
+    #' @description Deserializes the given string using yaml::yaml.load_file
+    #' @return (list) the deserialized object, an R list
     deserialize_path = function() {
-      # @param [String] string path to a YAML file
-      # @return [Hash] the deserialized object, an R list
-
       # filter_sensitive_data replacement
       # FIXME: eventually move to higher level so that this happens
       #  regardless of serializer
@@ -84,8 +73,16 @@ YAML <- R6::R6Class("YAML",
         # check for base64 encoding
         tmp$http_interactions <- lapply(tmp$http_interactions, function(z) {
           if (is_base64(z$response$body$string)) {
-            z$response$body$string <-
-              rawToChar(base64enc::base64decode(z$response$body$string))
+            b64dec <- base64enc::base64decode(z$response$body$string)
+            b64dec_r2c <- tryCatch(rawToChar(b64dec), error = function(e) e)
+            z$response$body$string <- if (inherits(b64dec_r2c, "error")) {
+              # probably is binary (e.g., pdf), so can't be converted to char.
+              b64dec
+            } else {
+              # probably was originally character data, so 
+              #  can convert to character from binary
+              b64dec_r2c
+            }
             z$response$body$encoding <-
               suppressMessages(encoding_guess(z$response$body$string, TRUE))
           }

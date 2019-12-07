@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2019-08-20" />
+<meta name="date" content="2019-12-07" />
 
 <title>vcr introduction</title>
 
@@ -1357,7 +1356,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -1419,6 +1417,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -1447,6 +1446,12 @@ summary {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -1519,7 +1524,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">vcr introduction</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2019-08-20</h4>
+<h4 class="date">2019-12-07</h4>
 
 </div>
 
@@ -1530,7 +1535,7 @@ div.tocify {
 <p><code>vcr</code> helps you stub HTTP requests so you don’t have to repeat HTTP requests.</p>
 <p>The main use case is for unit tests, but you can use it outside of the unit test use case.</p>
 <p><code>vcr</code> works with the <code>crul</code> and <code>httr</code> HTTP request packages; we’re working on support for <code>curl</code>.</p>
-<p>Check out the <a href="https://ropenscilabs.github.io/http-testing-book/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
+<p>Check out the <a href="https://books.ropensci.org/http-testing/">http testing book</a> for a lot more documentation on <code>vcr</code>, <code>webmockr</code>, and <code>crul</code></p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>CRAN</p>
@@ -1563,13 +1568,13 @@ system.time(
     method: get
     uri: https://eu.httpbin.org/get
     body:
-      encoding: ''
-      string: ''
+      encoding: &#39;&#39;
+      string: &#39;&#39;
     headers:
       User-Agent: libcurl/7.54.0 r-curl/3.2 crul/0.5.2
   response:
     status:
-      status_code: '200'
+      status_code: &#39;200&#39;
       message: OK
       explanation: Request fulfilled, document follows
     headers:
