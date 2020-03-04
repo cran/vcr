@@ -1,5 +1,5 @@
 #' @title Cassette handler
-#' @description Main R6 class that is called from the main user facing 
+#' @description Main R6 class that is called from the main user facing
 #' function [use_cassette()]
 #' @export
 #' @keywords internal
@@ -132,32 +132,14 @@ Cassette <- R6::R6Class(
       self$serialize_with <- serialize_with
       self$persist_with <- persist_with
       if (!missing(record)) {
-        recmodes <- c("none", "once", "new_episodes", "all")
-        if (!record %in% recmodes) {
-          stop("'record' value of '", record, "' is not in the allowed set: ",
-               paste0(recmodes, collapse = ", "), call. = FALSE)
-        }
-        self$record <- record
+        self$record <- check_record_mode(record)
       }
       self$make_dir()
       self$manfile <- sprintf("%s/%s.yml", path.expand(cassette_path()),
                               self$name)
       if (!file.exists(self$manfile)) cat("\n", file = self$manfile)
       if (!missing(match_requests_on)) {
-        mro <- c("method", "uri", "headers", "host", "path", "body")
-        if (!any(match_requests_on %in% mro)) {
-          stop("1 or more 'match_requests_on' values (",
-               paste0(match_requests_on, collapse = ", "),
-               ") is not in the allowed set: ",
-               paste0(mro, collapse = ", "), call. = FALSE)
-        }
-        # we don't yet support the following matchers: host, path
-        if (any(match_requests_on %in% c("host", "path"))) {
-          stop("we do not yet support host and path matchers",
-            "\n see https://github.com/ropensci/vcr/issues/70",
-            call. = FALSE)
-        }
-        self$match_requests_on <- match_requests_on
+        self$match_requests_on <- check_request_matchers(match_requests_on)
       }
       if (!missing(re_record_interval))
         self$re_record_interval <- re_record_interval
@@ -657,10 +639,10 @@ Cassette <- R6::R6Class(
         method = x$request$method,
         uri = x$url,
         body = if (inherits(x, "response")) { # httr
-          bd <- get_httr_body(x$request)
+          bd <- webmockr::pluck_body(x$request)
           if (inherits(bd, "raw")) rawToChar(bd) else bd
         } else { # crul
-          x$request$fields
+          webmockr::pluck_body(x$request)
         },
         headers = if (inherits(x, "response")) {
           as.list(x$request$headers)
@@ -670,7 +652,7 @@ Cassette <- R6::R6Class(
         opts = self$cassette_opts,
         disk = is_disk
       )
-      
+
       response <- VcrResponse$new(
         status = if (inherits(x, "response")) {
           c(list(status_code = x$status_code), httr::http_status(x))
@@ -683,7 +665,7 @@ Cassette <- R6::R6Class(
           if (file.exists(x$content)) {
             # calculate new file path in fixtures/
             # copy file into fixtures/file_cache/
-            # don't move b/c don't want to screw up first use before using 
+            # don't move b/c don't want to screw up first use before using
             # cached request
             file.copy(x$content, write_disk_path,
               overwrite = TRUE, recursive = TRUE) # copy the file

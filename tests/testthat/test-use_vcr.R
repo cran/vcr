@@ -1,6 +1,8 @@
 context("use_vcr works")
 
 test_that("use_vcr works", {
+  skip_on_cran()
+  
   expect_is(use_vcr, "function")
 
   dir <- file.path(tempdir(), "foobar")
@@ -10,8 +12,16 @@ test_that("use_vcr works", {
   expect_true(dir.exists(file.path(dir, "tests")))
   expect_true(file.exists(file.path(dir, "tests/testthat.R")))
   expect_true(file.exists(file.path(dir, "tests/testthat/helper-foobar.R")))
+  help <- paste0(readLines(file.path(dir, "tests/testthat/helper-foobar.R")),
+    collapse = " ")
+  expect_match(help, "vcr::vcr_configure")
+  expect_match(help, "vcr::check_cassette_names")
   expect_true(file.exists(file.path(dir, "tests/testthat/test-vcr_example.R")))
   expect_true(any(grepl("vcr", readLines(file.path(dir, "DESCRIPTION")))))
+  expect_true(file.exists(file.path(dir, ".gitattributes")))
+  gitatts <- readLines(file.path(dir, ".gitattributes"))
+  expect_true(any(grepl("text=auto", gitatts)))
+  expect_true(any(grepl("tests/fixtures", gitatts)))
 
   # cleanup
   unlink(dir, TRUE, TRUE)

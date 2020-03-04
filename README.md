@@ -3,6 +3,8 @@ vcr
 
 
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 [![cran checks](https://cranchecks.info/badges/worst/vcr)](https://cranchecks.info/pkgs/vcr)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Build Status](https://travis-ci.org/ropensci/vcr.svg)](https://travis-ci.org/ropensci/vcr)
@@ -11,7 +13,8 @@ vcr
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/vcr)](https://github.com/metacran/cranlogs.app)
 [![cran version](https://www.r-pkg.org/badges/version/vcr)](https://cran.r-project.org/package=vcr)
 
-An R port of the Ruby gem [vcr](https://github.com/vcr/vcr)
+
+`vcr` helps you stub and replay your HTTP requests. The main use case is for unit tests for R packages. An R port of the Ruby gem [vcr](https://github.com/vcr/vcr)
 
 ## Docs
 
@@ -37,8 +40,8 @@ system.time(
     cli$get("get")
   })
 )
-#>    user  system elapsed 
-#>   0.160   0.023   0.640
+#>    user  system elapsed
+#>   0.163   0.022   0.639
 ```
 
 The request gets recorded, and all subsequent requests of the same form used the cached HTTP response, and so are much faster
@@ -50,8 +53,8 @@ system.time(
     cli$get("get")
   })
 )
-#>    user  system elapsed 
-#>   0.076   0.005   0.083
+#>    user  system elapsed
+#>   0.115   0.006   0.136
 ```
 
 
@@ -94,20 +97,14 @@ All components of both the request and response are preserved, so that the HTTP 
 ## Terminology
 
 * _vcr_: the name comes from the idea that we want to record something and play it back later, like a vcr
-* _cassette_: A _thing_ to record HTTP interactions to. Right now the only option is file system, but in the future could be other things, e.g. a key-value store like Redis
-* Persisters: defines how to save requests - currently only option is the file system
-* Serializers: defines how to serialize the HTTP response - currently only option is YAML; other options in the future could include e.g. JSON
+* _cassette_: A _thing_ to record HTTP interactions to. Right now the only option is the file system (writing to files), but in the future could be other things, e.g. a key-value store like Redis
+* _fixture_: A fixture is something used to consistently test a piece of software. In this case, a cassette (just defined above) is a fixture - used in unit tests. If you use our setup function `vcr_setup()` the default directory created to hold cassettes is called `fixtures/` as a signal as to what the folder contains.
+* Persisters: how to save requests - currently only option is the file system
+* _serialize_: translating data into a format that can be stored; here, translate HTTP request and response data into a representation on disk to read back later
+* Serializers: how to serialize the HTTP response - currently only option is YAML; other options in the future could include e.g. JSON
 * _insert cassette_: create a cassette (all HTTP interactions will be recorded to this cassette)
 * _eject cassette_: eject the cassette (no longer recording to that cassette)
 * _replay_: refers to using a cached result of an http request that was recorded earlier
-
-## What does vcr do?
-
-The short version is: `vcr` helps you stub HTTP requests so you don't have to repeat HTTP requests.
-
-The main use case is for unit tests for R packages.
-
-`vcr` currently works with the `crul` and `httr` packages; support for `curl` is in the works.
 
 ### How it works in lots of detail
 
@@ -147,7 +144,7 @@ You're looking for [webmockr][]. `webmockr` only matches requests based on crite
 
 ### vcr for tests
 
-* Add `vcr` to `Suggests` in your DESCRIPTION file (optionally add `webmockr`, but it's not explicitly needed as `vcr` will pull it in) 
+* Add `vcr` to `Suggests` in your DESCRIPTION file (optionally add `webmockr`, but it's not explicitly needed as `vcr` will pull it in)
 * Make a file in your `tests/testthat/` directory called `helper-yourpackage.R` (or skip if as similar file already exists). In that file use the following lines to setup your path for storing cassettes (change path to whatever you want):
 
 ```r
@@ -170,7 +167,7 @@ vcr::use_cassette("rl_citation", {
 })
 ```
 
-OR put the `vcr::use_cassette()` block on the inside, but put `testthat` expectations outside of 
+OR put the `vcr::use_cassette()` block on the inside, but put `testthat` expectations outside of
 the `vcr::use_cassette()` block:
 
 ```r
@@ -188,8 +185,8 @@ test_that("my test", {
 
 Don't wrap the `use_cassette()` block inside your  `test_that()` block with `testthat` expectations inside the `use_cassette()` block, as you'll only get the line number that the `use_cassette()` block starts on on failures.
 
-* When running tests or checks of your whole package, note that some users have found different results with 
-`devtools::check()` vs. `devtools::test()`. It's not clear why this would make a difference. Do let us know 
+* When running tests or checks of your whole package, note that some users have found different results with
+`devtools::check()` vs. `devtools::test()`. It's not clear why this would make a difference. Do let us know
 if you run into this problem.
 
 ### vcr in your R project
@@ -324,6 +321,11 @@ We've tried to make sure the parameters that are ignored are marked as such. Kee
 * [rplos][]
 * [ritis][]
 
+## Contributors
+
+* [Scott Chamberlain](https://github.com/sckott)
+* [Aaron Wolen](https://github.com/aaronwolen)
+
 ## Meta
 
 * Please [report any issues or bugs](https://github.com/ropensci/vcr/issues)
@@ -337,7 +339,7 @@ By participating in this project you agree to abide by its terms.
 [webmockr]: https://github.com/ropensci/webmockr
 [crul]: https://github.com/ropensci/crul
 [rgbif]: https://github.com/ropensci/rgbif
-[rdatacite]: https://github.com/ropensci/rdatacite  
+[rdatacite]: https://github.com/ropensci/rdatacite
 [rredlist]: https://github.com/ropensci/rredlist
 [bold]: https://github.com/ropensci/bold
 [wikitaxa]: https://github.com/ropensci/wikitaxa
