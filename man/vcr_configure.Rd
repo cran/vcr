@@ -33,7 +33,12 @@ for any requests that write responses to disk. by default this parameter
 is \code{NULL}. For testing a package, you'll probably want this path to
 be in your \verb{tests/} directory, perhaps next to your cassettes
 directory, e.g., where your cassettes are in \code{tests/fixtures}, your
-files from requests that write to disk are in \code{tests/files}
+files from requests that write to disk are in \code{tests/files}.
+If you want to ignore these files in your installed package,
+add them to \code{.Rinstignore}. If you want these files ignored on build
+then add them to \code{.Rbuildignore} (though if you do, tests that depend
+on these files probably will not work because they won't be found; so
+you'll likely have to skip the associated tests as well).
 }
 }
 
@@ -69,6 +74,21 @@ replacement happens in internal function \code{YAML$deserialize_path()}
 }
 }
 
+}
+
+\subsection{Errors}{
+\itemize{
+\item \code{verbose_errors} Do you want more verbose errors or less verbose
+errors when cassette recording/usage fails? Default is \code{FALSE}, that is,
+less verbose errors. If \code{TRUE}, error messages will include more details
+about what went wrong and suggest possible solutions. For testing
+in an interactive R session, if \code{verbose_errors=FALSE}, you can run
+\code{vcr_last_error()} to get the full error. If in non-interactive mode,
+which most users will be in when running the entire test suite for a
+package, you can set an environment variable (\code{VCR_VERBOSE_ERRORS})
+to toggle this setting (e.g.,
+\verb{Sys.setenv(VCR_VERBOSE_ERRORS=TRUE); devtools::test()})
+}
 \subsection{Internals}{
 \itemize{
 \item \code{cassettes} (list) don't use

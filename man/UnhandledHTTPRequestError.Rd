@@ -2,7 +2,11 @@
 % Please edit documentation in R/errors.R
 \name{UnhandledHTTPRequestError}
 \alias{UnhandledHTTPRequestError}
+\alias{vcr_last_error}
 \title{UnhandledHTTPRequestError}
+\usage{
+vcr_last_error()
+}
 \description{
 Handle http request errors
 }
@@ -64,7 +68,11 @@ err$match_requests_on_suggestion()
 # err$construct_message()
 
 # cleanup
+eject_cassette("turtle")
 unlink(tempdir())
+\dontrun{
+# vcr_last_error()
+}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -88,6 +96,7 @@ unlink(tempdir())
 \item \href{#method-formatted_headers}{\code{UnhandledHTTPRequestError$formatted_headers()}}
 \item \href{#method-cassettes_description}{\code{UnhandledHTTPRequestError$cassettes_description()}}
 \item \href{#method-cassettes_list}{\code{UnhandledHTTPRequestError$cassettes_list()}}
+\item \href{#method-get_help}{\code{UnhandledHTTPRequestError$get_help()}}
 \item \href{#method-formatted_suggestions}{\code{UnhandledHTTPRequestError$formatted_suggestions()}}
 \item \href{#method-format_bullet_point}{\code{UnhandledHTTPRequestError$format_bullet_point()}}
 \item \href{#method-format_foot_note}{\code{UnhandledHTTPRequestError$format_foot_note()}}
@@ -102,6 +111,7 @@ unlink(tempdir())
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{UnhandledHTTPRequestError} object
 \subsection{Usage}{
@@ -123,6 +133,7 @@ A new \code{UnhandledHTTPRequestError} object
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run"></a>}}
+\if{latex}{\out{\hypertarget{method-run}{}}}
 \subsection{Method \code{run()}}{
 Run unhandled request handling
 \subsection{Usage}{
@@ -135,6 +146,7 @@ various
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-construct_message"></a>}}
+\if{latex}{\out{\hypertarget{method-construct_message}{}}}
 \subsection{Method \code{construct_message()}}{
 Construct and execute stop message for why request failed
 \subsection{Usage}{
@@ -147,6 +159,7 @@ a stop message
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-request_description"></a>}}
+\if{latex}{\out{\hypertarget{method-request_description}{}}}
 \subsection{Method \code{request_description()}}{
 construct request description
 \subsection{Usage}{
@@ -159,6 +172,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-current_matchers"></a>}}
+\if{latex}{\out{\hypertarget{method-current_matchers}{}}}
 \subsection{Method \code{current_matchers()}}{
 get current request matchers
 \subsection{Usage}{
@@ -171,6 +185,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-match_request_on_headers"></a>}}
+\if{latex}{\out{\hypertarget{method-match_request_on_headers}{}}}
 \subsection{Method \code{match_request_on_headers()}}{
 are headers included in current matchers?
 \subsection{Usage}{
@@ -183,6 +198,7 @@ logical
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-match_request_on_body"></a>}}
+\if{latex}{\out{\hypertarget{method-match_request_on_body}{}}}
 \subsection{Method \code{match_request_on_body()}}{
 is body includled in current matchers?
 \subsection{Usage}{
@@ -195,6 +211,7 @@ logical
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-formatted_headers"></a>}}
+\if{latex}{\out{\hypertarget{method-formatted_headers}{}}}
 \subsection{Method \code{formatted_headers()}}{
 get request headers
 \subsection{Usage}{
@@ -207,6 +224,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-cassettes_description"></a>}}
+\if{latex}{\out{\hypertarget{method-cassettes_description}{}}}
 \subsection{Method \code{cassettes_description()}}{
 construct description of current or lack thereof cassettes
 \subsection{Usage}{
@@ -219,6 +237,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-cassettes_list"></a>}}
+\if{latex}{\out{\hypertarget{method-cassettes_list}{}}}
 \subsection{Method \code{cassettes_list()}}{
 cassette details
 \subsection{Usage}{
@@ -230,7 +249,21 @@ character
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_help"></a>}}
+\if{latex}{\out{\hypertarget{method-get_help}{}}}
+\subsection{Method \code{get_help()}}{
+get help message for non-verbose error
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{UnhandledHTTPRequestError$get_help()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+character
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-formatted_suggestions"></a>}}
+\if{latex}{\out{\hypertarget{method-formatted_suggestions}{}}}
 \subsection{Method \code{formatted_suggestions()}}{
 make suggestions for what to do
 \subsection{Usage}{
@@ -243,6 +276,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-format_bullet_point"></a>}}
+\if{latex}{\out{\hypertarget{method-format_bullet_point}{}}}
 \subsection{Method \code{format_bullet_point()}}{
 add bullet point to beginning of a line
 \subsection{Usage}{
@@ -264,6 +298,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-format_foot_note"></a>}}
+\if{latex}{\out{\hypertarget{method-format_foot_note}{}}}
 \subsection{Method \code{format_foot_note()}}{
 make a foot note
 \subsection{Usage}{
@@ -285,6 +320,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-suggestion_for"></a>}}
+\if{latex}{\out{\hypertarget{method-suggestion_for}{}}}
 \subsection{Method \code{suggestion_for()}}{
 get a suggestion by key
 \subsection{Usage}{
@@ -304,6 +340,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-suggestions"></a>}}
+\if{latex}{\out{\hypertarget{method-suggestions}{}}}
 \subsection{Method \code{suggestions()}}{
 get all suggestions
 \subsection{Usage}{
@@ -316,6 +353,7 @@ list
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-no_cassette_suggestions"></a>}}
+\if{latex}{\out{\hypertarget{method-no_cassette_suggestions}{}}}
 \subsection{Method \code{no_cassette_suggestions()}}{
 get all no cassette suggestions
 \subsection{Usage}{
@@ -328,6 +366,7 @@ list
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-record_mode_suggestion"></a>}}
+\if{latex}{\out{\hypertarget{method-record_mode_suggestion}{}}}
 \subsection{Method \code{record_mode_suggestion()}}{
 get the appropriate record mode suggestion
 \subsection{Usage}{
@@ -340,6 +379,7 @@ character
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-has_used_interaction_matching"></a>}}
+\if{latex}{\out{\hypertarget{method-has_used_interaction_matching}{}}}
 \subsection{Method \code{has_used_interaction_matching()}}{
 are there any used interactions
 \subsection{Usage}{
@@ -352,6 +392,7 @@ logical
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-match_requests_on_suggestion"></a>}}
+\if{latex}{\out{\hypertarget{method-match_requests_on_suggestion}{}}}
 \subsection{Method \code{match_requests_on_suggestion()}}{
 match requests on suggestion
 \subsection{Usage}{
@@ -364,6 +405,7 @@ list
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

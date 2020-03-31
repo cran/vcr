@@ -17,7 +17,12 @@
 #' is `NULL`. For testing a package, you'll probably want this path to
 #' be in your `tests/` directory, perhaps next to your cassettes
 #' directory, e.g., where your cassettes are in `tests/fixtures`, your
-#' files from requests that write to disk are in `tests/files`
+#' files from requests that write to disk are in `tests/files`.
+#' If you want to ignore these files in your installed package, 
+#' add them to `.Rinstignore`. If you want these files ignored on build
+#' then add them to `.Rbuildignore` (though if you do, tests that depend
+#' on these files probably will not work because they won't be found; so
+#' you'll likely have to skip the associated tests as well).
 #'
 #' ### Contexts
 #'
@@ -47,6 +52,19 @@
 #' replacement to get back to the real data. Before record replacement happens
 #' in internal function `write_interactions()`, while before playback
 #' replacement happens in internal function `YAML$deserialize_path()`
+#' 
+#' ## Errors
+#' 
+#' - `verbose_errors` Do you want more verbose errors or less verbose
+#' errors when cassette recording/usage fails? Default is `FALSE`, that is,
+#' less verbose errors. If `TRUE`, error messages will include more details
+#' about what went wrong and suggest possible solutions. For testing
+#' in an interactive R session, if `verbose_errors=FALSE`, you can run
+#' `vcr_last_error()` to get the full error. If in non-interactive mode,
+#' which most users will be in when running the entire test suite for a
+#' package, you can set an environment variable (`VCR_VERBOSE_ERRORS`)
+#' to toggle this setting (e.g.,
+#' `Sys.setenv(VCR_VERBOSE_ERRORS=TRUE); devtools::test()`)
 #'
 #' ### Internals
 #'
@@ -81,7 +99,6 @@
 #' re-recorded at the given interval, in seconds.
 #' - `clean_outdated_http_interactions` (logical) Should outdated interactions
 #' be recorded back to file. Default: `FALSE`
-#'
 #'
 #' @examples
 #' vcr_configure(dir = tempdir())
@@ -178,7 +195,8 @@ VCRConfig <- R6::R6Class(
     .log = NULL,
     .log_opts = NULL,
     .filter_sensitive_data = NULL,
-    .write_disk_path = NULL
+    .write_disk_path = NULL,
+    .verbose_errors = NULL
   ),
 
   active = list(
@@ -283,6 +301,12 @@ VCRConfig <- R6::R6Class(
     write_disk_path = function(value) {
       if (missing(value)) return(private$.write_disk_path)
       private$.write_disk_path <- value
+    },
+    verbose_errors = function(value) {
+      env_ve <- vcr_env_verbose_errors()
+      if (missing(value) && is.null(env_ve)) return(private$.verbose_errors)
+      value <- env_ve %||% value
+      private$.verbose_errors <- assert(value, "logical")
     }
   ),
 
@@ -308,7 +332,8 @@ VCRConfig <- R6::R6Class(
       log = FALSE,
       log_opts = list(file = "vcr.log", log_prefix = "Cassette", date = TRUE),
       filter_sensitive_data = NULL,
-      write_disk_path = NULL
+      write_disk_path = NULL,
+      verbose_errors = FALSE
     ) {
       self$dir <- dir
       self$record <- record
@@ -331,6 +356,7 @@ VCRConfig <- R6::R6Class(
       self$log_opts <- log_opts
       self$filter_sensitive_data <- filter_sensitive_data
       self$write_disk_path <- write_disk_path
+      self$verbose_errors <- verbose_errors
     },
 
     # reset all settings to defaults
@@ -364,3 +390,13 @@ VCRConfig <- R6::R6Class(
 )
 
 pastec <- function(x) paste0(x, collapse = ", ")
+
+vcr_env_verbose_errors <- function() {
+  var <- "VCR_VERBOSE_ERRORS"
+  x <- Sys.getenv(var, "")
+  if (x != "") {
+    x <- as.logical(x)
+    vcr_env_var_check(x, var)
+    x
+  }
+}
