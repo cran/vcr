@@ -70,7 +70,17 @@ We replace all instances of \code{thing_to_replace} with
 the replacement and then when reading from the cassette we do the reverse
 replacement to get back to the real data. Before record replacement happens
 in internal function \code{write_interactions()}, while before playback
-replacement happens in internal function \code{YAML$deserialize_path()}
+replacement happens in internal function \code{YAML$deserialize()}
+\item \code{filter_request_headers} (character/list) \strong{request} headers to filter.
+A character vector of request headers to remove - the headers will not be
+recorded to disk. Alternatively, a named list similar to
+\code{filter_sensitive_data} instructing vcr with what value to replace the
+real value of the request header.
+\item \code{filter_response_headers} (named list) \strong{response} headers to filter.
+A character vector of response headers to remove - the headers will not be
+recorded to disk. Alternatively, a named list similar to
+\code{filter_sensitive_data} instructing vcr with what value to replace the
+real value of the response header.
 }
 }
 
@@ -93,7 +103,7 @@ to toggle this setting (e.g.,
 \itemize{
 \item \code{cassettes} (list) don't use
 \item \code{linked_context} (logical) linked context
-\item \code{uri_parser} the uri parser, default: \code{\link[crul:url_parse]{crul::url_parse()}}
+\item \code{uri_parser} the uri parser, default: \code{crul::url_parse()}
 }
 }
 
@@ -117,13 +127,18 @@ that prefix, then the rest of the message.
 These settings can be configured globally, using \code{vcr_configure()}, or
 locally, using either \code{use_cassette()} or \code{insert_cassette()}. Global
 settings are applied to \emph{all} cassettes but are overridden by settings
-defined locally for individuall cassettes.
+defined locally for individual cassettes.
 \itemize{
 \item \code{record} (character) One of 'all', 'none', 'new_episodes', or 'once'.
 See \link{recording}
 \item \code{match_requests_on} vector of matchers. Default: (\code{method}, \code{uri})
 See \link{request-matching} for details.
-\item \code{serialize_with}: (character) only option is "yaml"
+\item \code{serialize_with}: (character) "yaml" or "json". Note that you can have
+multiple cassettes with the same name as long as they use different
+serializers; so if you only want one cassette for a given cassette name,
+make sure to not switch serializers, or clean up files you no longer need.
+\item \code{json_pretty}: (logical) want JSON to be newline separated to be easier
+to read? Or remove newlines to save disk space? default: FALSE
 \item \code{persist_with} (character) only option is "FileSystem"
 \item \code{preserve_exact_body_bytes} (logical) preserve exact body bytes for
 \item \code{re_record_interval} (numeric) When given, the cassette will be

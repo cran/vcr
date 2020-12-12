@@ -10,6 +10,32 @@ an object of class \code{Cassette}
 Main R6 class that is called from the main user facing
 function \code{\link[=use_cassette]{use_cassette()}}
 }
+\section{Points of webmockr integration}{
+
+\itemize{
+\item \code{initialize()}: webmockr is used in the \code{initialize()} method to
+create webmockr stubs. stubs are created on call to \code{Cassette$new()}
+within \code{insert_cassette()}, but then on exiting \code{use_cassette()},
+or calling \code{eject()} on \code{Cassette} class from \code{insert_cassette()},
+stubs are cleaned up.
+\item \code{eject()} method: \code{\link[webmockr:enable]{webmockr::disable()}} is called before exiting
+eject to disable webmock so that webmockr does not affect any HTTP
+requests that happen afterwards
+\item \code{call_block()} method: call_block is used in the \code{\link[=use_cassette]{use_cassette()}}
+function to evaluate whatever code is passed to it; within call_block
+\code{\link[webmockr:webmockr_configure]{webmockr::webmockr_allow_net_connect()}} is run before we evaluate
+the code block to allow real HTTP requests, then
+\code{\link[webmockr:webmockr_configure]{webmockr::webmockr_disable_net_connect()}} is called after evalulating
+the code block to disallow real HTTP requests
+\item \code{make_http_interaction()} method: \code{\link[webmockr:pluck_body]{webmockr::pluck_body()}} utility
+function is used to pull the request body out of the HTTP request
+\item \code{serialize_to_crul()} method: method: \link[webmockr:RequestSignature]{webmockr::RequestSignature} and
+\link[webmockr:Response]{webmockr::Response} are used to build a request and response,
+respectively, then passed to \code{\link[webmockr:build_crul_response]{webmockr::build_crul_response()}}
+to make a complete \code{crul} HTTP response object
+}
+}
+
 \examples{
 library(vcr)
 vcr_configure(dir = tempdir())
@@ -30,6 +56,12 @@ res$eject()
 
 # cleanup
 unlink(file.path(tempdir(), c("bob.yml", "foobar.yml")))
+
+library(vcr)
+vcr_configure(dir = tempdir())
+res <- Cassette$new(name = "jane")
+library(crul)
+HttpClient$new("https://httpbin.org")$get("get")
 }
 \seealso{
 \code{\link[=vcr_configure]{vcr_configure()}}, \code{\link[=use_cassette]{use_cassette()}}, \code{\link[=insert_cassette]{insert_cassette()}}
@@ -46,9 +78,9 @@ unlink(file.path(tempdir(), c("bob.yml", "foobar.yml")))
 
 \item{\code{recorded_at}}{(character) date/time recorded at}
 
-\item{\code{serialize_with}}{(character) serializer to use (yaml only)}
+\item{\code{serialize_with}}{(character) serializer to use (yaml|json)}
 
-\item{\code{serializer}}{(character) serializer to use (yaml only)}
+\item{\code{serializer}}{(character) serializer to use (yaml|json)}
 
 \item{\code{persist_with}}{(character) persister to use (FileSystem only)}
 
@@ -67,8 +99,6 @@ default: method & uri}
 
 \item{\code{update_content_length_header}}{(logical) Whether to overwrite the
 \code{Content-Length} header}
-
-\item{\code{decode_compressed_response}}{(logical) ignored, not used right now}
 
 \item{\code{allow_playback_repeats}}{(logical) Whether to allow a single HTTP
 interaction to be played back multiple times}
@@ -138,14 +168,13 @@ Create a new \code{Cassette} object
 \if{html}{\out{<div class="r">}}\preformatted{Cassette$new(
   name,
   record,
-  serialize_with = "yaml",
-  persist_with = "FileSystem",
-  match_requests_on = c("method", "uri"),
+  serialize_with,
+  persist_with,
+  match_requests_on,
   re_record_interval,
   tag,
   tags,
   update_content_length_header,
-  decode_compressed_response,
   allow_playback_repeats,
   allow_unused_http_interactions,
   exclusive,
@@ -184,8 +213,6 @@ re-recorded at the given interval, in seconds.}
 \item{\code{update_content_length_header}}{(logical) Whether or
 not to overwrite the \code{Content-Length} header of the responses to
 match the length of the response body. Default: \code{FALSE}}
-
-\item{\code{decode_compressed_response}}{(logical) ignored, not used right now}
 
 \item{\code{allow_playback_repeats}}{(logical) Whether or not to
 allow a single HTTP interaction to be played back multiple times.
@@ -240,7 +267,7 @@ run code
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{pass in things to be lazy eval'ed}
+\item{\code{...}}{pass in things to be evaluated}
 }
 \if{html}{\out{</div>}}
 }

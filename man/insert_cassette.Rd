@@ -42,7 +42,10 @@ allow a single HTTP interaction to be played back multiple times.
 Default: \code{FALSE}.}
 
 \item{serialize_with}{(character) Which serializer to use.
-Valid values are "yaml" (default), the only one supported for now.}
+Valid values are "yaml" (default) and "json". Note that you can have
+multiple cassettes with the same name as long as they use different
+serializers; so if you only want one cassette for a given cassette name,
+make sure to not switch serializers, or clean up files you no longer need.}
 
 \item{persist_with}{(character) Which cassette persister to
 use. Default: "file_system". You can also register and use a
@@ -91,8 +94,8 @@ the user.
 \item Should not have illegal characters that can lead to problems in using
 file paths: '/', '?', '<', '>', '\\', ':', '*', '|', and '\"'
 \item Should not have control characters, e.g., \verb{\\n}
-\item Should not have just dots, e.g,. \code{.} or \code{..}
-\item Should not have Windows reserved words, e.g, \code{com1}
+\item Should not have just dots, e.g., \code{.} or \code{..}
+\item Should not have Windows reserved words, e.g., \code{com1}
 \item Should not have trailing dots
 \item Should not be longer than 255 characters
 }
@@ -108,11 +111,20 @@ webmockr::webmockr_allow_net_connect()
 (x <- insert_cassette(name = "leo5"))
 current_cassette()
 x$new_recorded_interactions
+x$previously_recorded_interactions()
 cli <- crul::HttpClient$new(url = "https://httpbin.org")
 cli$get("get")
-x$new_recorded_interactions
+x$new_recorded_interactions # 1 interaction
+x$previously_recorded_interactions() # empty
+webmockr::stub_registry() # not empty
 # very important when using inject_cassette: eject when done
 x$eject() # same as eject_cassette("leo5")
+x$new_recorded_interactions # same, 1 interaction
+x$previously_recorded_interactions() # now not empty
+## stub_registry now empty, eject() calls webmockr::disable(), which
+## calls the disable method for each of crul and httr adadapters, 
+## which calls webmockr's remove_stubs() method for each adapter
+webmockr::stub_registry()
 
 # cleanup
 unlink(file.path(tempdir(), "leo5.yml"))

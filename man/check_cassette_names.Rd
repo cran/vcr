@@ -20,7 +20,7 @@ Check cassette names
 }
 \details{
 This function is meant to be run during your tests, from a
-\code{helper-pkgname.R} file inside the \code{tests/testthat} directory. It only
+\code{setup-pkgname.R} file inside the \code{tests/testthat} directory. It only
 checks that cassette names are not duplicated. A helper function
 \code{check_cassette_name()} runs inside \code{\link[=insert_cassette]{insert_cassette()}} that checks
 that cassettes do not have: spaces, file extensions, unaccepted
@@ -41,8 +41,8 @@ the user.
 \item Should not have illegal characters that can lead to problems in using
 file paths: '/', '?', '<', '>', '\\', ':', '*', '|', and '\"'
 \item Should not have control characters, e.g., \verb{\\n}
-\item Should not have just dots, e.g,. \code{.} or \code{..}
-\item Should not have Windows reserved words, e.g, \code{com1}
+\item Should not have just dots, e.g., \code{.} or \code{..}
+\item Should not have Windows reserved words, e.g., \code{com1}
 \item Should not have trailing dots
 \item Should not be longer than 255 characters
 }

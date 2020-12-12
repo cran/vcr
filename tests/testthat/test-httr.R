@@ -49,12 +49,33 @@ test_that("httr use_cassette works", {
   out <- use_cassette("httr_test1", {
     x <- GET("https://httpbin.org/404")
   })
+  invisible(use_cassette("httr_test1", {
+    x2 <- GET("https://httpbin.org/404")
+  }))
 
   # cassette
   expect_is(out, "Cassette")
   expect_match(out$manfile, "httr_test1")
   expect_false(out$is_empty())
   expect_is(out$recorded_at, "POSIXct")
+
+  # request - 1st http call
+  expect_is(x$request, "request")
+  expect_equal(x$request$method, "GET")
+  expect_equal(x$request$url, "https://httpbin.org/404")
+  expect_named(x$request$headers, "Accept")
+  expect_null(x$request$fields)
+  expect_true(x$request$options$httpget)
+  expect_is(x$request$output, "write_function")
+  
+  # request - 2nd http call
+  expect_is(x2$request, "request")
+  expect_equal(x2$request$method, "GET")
+  expect_equal(x2$request$url, "https://httpbin.org/404")
+  expect_named(x2$request$headers, "Accept")
+  expect_null(x2$request$fields)
+  expect_true(x2$request$options$httpget)
+  expect_null(x2$request$output) # can't really populate this from cassette
 
   # response
   expect_is(x, "response")
@@ -70,7 +91,7 @@ test_that("httr use_cassette works", {
   expect_match(str[[1]]$response$body$string, "DOCTYPE HTML")
 
   # cleanup
-  unlink(file.path(vcr_configuration()$dir, "httr_test2.yml"))
+  unlink(file.path(vcr_configuration()$dir, "httr_test1.yml"))
 })
 
 
@@ -205,17 +226,20 @@ test_that("httr POST requests works", {
   expect_equal(strj$data, "some string")
 
   # body type: upload_file
+  ff <- tempfile(fileext = ".txt")
+  cat("hello world\n", file = ff)
   out4 <- use_cassette("httr_post_upload_file", {
     b <- POST("https://httpbin.org/post",
-      body = list(y = httr::upload_file(system.file("CITATION"))))
+      body = list(y = httr::upload_file(ff)))
   })
   expect_false(out4$is_empty())
   expect_is(b, "response")
   expect_equal(b$status_code, 200)
   str <- yaml::yaml.load_file(out4$manfile)$http_interactions
   strj <- jsonlite::fromJSON(str[[1]]$response$body$string)
-  expect_match(strj$files$y, "bibentry\\(") # files not empty
+  expect_match(strj$files$y, "hello world") # files not empty
   expect_false(nzchar(strj$data)) # data empty
+  unlink(ff)
   
   ## upload_file not in a list
   # out6 <- use_cassette("httr_post_upload_file_no_list", {

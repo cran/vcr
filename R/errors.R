@@ -4,18 +4,18 @@
 #' @details How this error class is used:
 #' If `record="once"` we trigger this.
 #'
-#' Users can use vcr in the context of both use_cassette
-#' and insert_cassette.
+#' Users can use vcr in the context of both [use_cassette()]
+#' and [insert_cassette()]
 #'
 #' For the former, all requests go through the call_block
-#' But for the latter, requests go through webmockr
+#' But for the latter, requests go through webmockr.
 #'
 #' Where is one place where we can put UnhandledHTTPRequestError
 #' that will handle both use_cassette and insert_cassette?
 #'
 #' @section Error situations where this is invoked:
 #'
-#' - record=once AND there's a new request that doesn't match
+#' - `record=once` AND there's a new request that doesn't match
 #' the one in the cassette on disk
 #'   - in webmockr: if no stub found and there are recorded
 #'    interactions on the cassette, and record = once, then
@@ -63,17 +63,11 @@ UnhandledHTTPRequestError <- R6::R6Class(
 
     #' @description Create a new `UnhandledHTTPRequestError` object
     #' @param request (Request) a [Request] object
-    #' @param cassette (character) a cassette name
     #' @return A new `UnhandledHTTPRequestError` object
-    initialize = function(request, cassette) {
+    initialize = function(request) {
       assert(request, "Request")
       self$request <- request
-      if (!missing(cassette)) {
-        assert(cassette, "character")
-        self$cassette <- cassette
-      } else {
-        self$cassette <- current_cassette()
-      }
+      self$cassette <- current_cassette()
     },
 
     #' @description Run unhandled request handling

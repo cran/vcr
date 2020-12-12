@@ -11,48 +11,48 @@ knitr::opts_chunk$set(
 #  library("vcr")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configuration()
+library("vcr")
 
 ## -----------------------------------------------------------------------------
-#  vcr_config_defaults()
+vcr_config_defaults()
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(
-#    dir = "foobar/vcr_cassettes"
-#  )
+vcr_configure(
+  dir = "foobar/vcr_cassettes"
+)
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(
-#    dir = "foobar/vcr_cassettes",
-#    record = "all"
-#  )
+vcr_configure(
+  dir = "foobar/vcr_cassettes",
+  record = "all"
+)
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure_reset()
+vcr_configure_reset()
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(dir = "new/path")
+vcr_configure(dir = "new/path")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(record = "new_episodes")
+vcr_configure(record = "new_episodes")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(match_requests_on = c('query', 'headers'))
+vcr_configure(match_requests_on = c('query', 'headers'))
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(allow_unused_http_interactions = FALSE)
+vcr_configure(allow_unused_http_interactions = FALSE)
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(serialize_with = "yaml")
+vcr_configure(serialize_with = "yaml")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(persist_with = "FileSystem")
+vcr_configure(persist_with = "FileSystem")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(ignore_hosts = "google.com")
+vcr_configure(ignore_hosts = "google.com")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(ignore_localhost = TRUE)
+vcr_configure(ignore_localhost = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  vcr_configure(ignore_hosts = "google.com")
@@ -62,13 +62,8 @@ knitr::opts_chunk$set(
 #  })
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(uri_parser = "urltools::url_parse")
+vcr_configure(uri_parser = "urltools::url_parse")
 
 ## -----------------------------------------------------------------------------
-#  vcr_configure(preserve_exact_body_bytes = TRUE)
-
-## -----------------------------------------------------------------------------
-#  vcr_configure(
-#    filter_sensitive_data = list("<some_api_key>" = Sys.getenv('MY_API_KEY'))
-#  )
+vcr_configure(preserve_exact_body_bytes = TRUE)
 

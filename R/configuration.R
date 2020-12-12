@@ -51,7 +51,18 @@
 #' the replacement and then when reading from the cassette we do the reverse
 #' replacement to get back to the real data. Before record replacement happens
 #' in internal function `write_interactions()`, while before playback
-#' replacement happens in internal function `YAML$deserialize_path()`
+#' replacement happens in internal function `YAML$deserialize()`
+#' 
+#' - `filter_request_headers` (character/list) **request** headers to filter.
+#' A character vector of request headers to remove - the headers will not be
+#' recorded to disk. Alternatively, a named list similar to
+#' `filter_sensitive_data` instructing vcr with what value to replace the
+#' real value of the request header.
+#' - `filter_response_headers` (named list) **response** headers to filter.
+#' A character vector of response headers to remove - the headers will not be
+#' recorded to disk. Alternatively, a named list similar to
+#' `filter_sensitive_data` instructing vcr with what value to replace the
+#' real value of the response header.
 #' 
 #' ## Errors
 #' 
@@ -70,7 +81,7 @@
 #'
 #' - `cassettes` (list) don't use
 #' - `linked_context` (logical) linked context
-#' - `uri_parser` the uri parser, default: [crul::url_parse()]
+#' - `uri_parser` the uri parser, default: `crul::url_parse()`
 #'
 #' ### Logging
 #'
@@ -86,13 +97,18 @@
 #' These settings can be configured globally, using `vcr_configure()`, or
 #' locally, using either `use_cassette()` or `insert_cassette()`. Global
 #' settings are applied to *all* cassettes but are overridden by settings
-#' defined locally for individuall cassettes.
+#' defined locally for individual cassettes.
 #'
 #' - `record` (character) One of 'all', 'none', 'new_episodes', or 'once'.
 #' See [recording]
 #' - `match_requests_on` vector of matchers. Default: (`method`, `uri`)
 #' See [request-matching] for details.
-#' - `serialize_with`: (character) only option is "yaml"
+#' - `serialize_with`: (character) "yaml" or "json". Note that you can have
+#' multiple cassettes with the same name as long as they use different
+#' serializers; so if you only want one cassette for a given cassette name,
+#' make sure to not switch serializers, or clean up files you no longer need.
+#' - `json_pretty`: (logical) want JSON to be newline separated to be easier
+#' to read? Or remove newlines to save disk space? default: FALSE
 #' - `persist_with` (character) only option is "FileSystem"
 #' - `preserve_exact_body_bytes` (logical) preserve exact body bytes for
 #' - `re_record_interval` (numeric) When given, the cassette will be
@@ -180,6 +196,7 @@ VCRConfig <- R6::R6Class(
     .match_requests_on = NULL,
     .allow_unused_http_interactions = NULL,
     .serialize_with = NULL,
+    .json_pretty = NULL,
     .persist_with = NULL,
     .ignore_hosts = NULL,
     .ignore_localhost = NULL,
@@ -195,6 +212,8 @@ VCRConfig <- R6::R6Class(
     .log = NULL,
     .log_opts = NULL,
     .filter_sensitive_data = NULL,
+    .filter_request_headers  = NULL,
+    .filter_response_headers  = NULL,
     .write_disk_path = NULL,
     .verbose_errors = NULL
   ),
@@ -219,6 +238,10 @@ VCRConfig <- R6::R6Class(
     serialize_with = function(value) {
       if (missing(value)) return(private$.serialize_with)
       private$.serialize_with <- value
+    },
+    json_pretty = function(value) {
+      if (missing(value)) return(private$.json_pretty)
+      private$.json_pretty <- value
     },
     persist_with = function(value) {
       if (missing(value)) return(private$.persist_with)
@@ -298,6 +321,16 @@ VCRConfig <- R6::R6Class(
       if (missing(value)) return(private$.filter_sensitive_data)
       private$.filter_sensitive_data <- assert(value, "list")
     },
+    filter_request_headers = function(value) {
+      if (missing(value)) return(private$.filter_request_headers)
+      if (is.character(value)) value <- as.list(value)
+      private$.filter_request_headers <- assert(value, "list")
+    },
+    filter_response_headers = function(value) {
+      if (missing(value)) return(private$.filter_response_headers)
+      if (is.character(value)) value <- as.list(value)
+      private$.filter_response_headers <- assert(value, "list")
+    },
     write_disk_path = function(value) {
       if (missing(value)) return(private$.write_disk_path)
       private$.write_disk_path <- value
@@ -317,6 +350,7 @@ VCRConfig <- R6::R6Class(
       match_requests_on = c("method", "uri"),
       allow_unused_http_interactions = TRUE,
       serialize_with = "yaml",
+      json_pretty = FALSE,
       persist_with = "FileSystem",
       ignore_hosts = NULL,
       ignore_localhost = FALSE,
@@ -332,6 +366,8 @@ VCRConfig <- R6::R6Class(
       log = FALSE,
       log_opts = list(file = "vcr.log", log_prefix = "Cassette", date = TRUE),
       filter_sensitive_data = NULL,
+      filter_request_headers  = NULL,
+      filter_response_headers  = NULL,
       write_disk_path = NULL,
       verbose_errors = FALSE
     ) {
@@ -340,6 +376,7 @@ VCRConfig <- R6::R6Class(
       self$match_requests_on <- match_requests_on
       self$allow_unused_http_interactions <- allow_unused_http_interactions
       self$serialize_with <- serialize_with
+      self$json_pretty <- json_pretty
       self$persist_with <- persist_with
       self$ignore_hosts <- ignore_hosts
       self$ignore_localhost <- ignore_localhost
@@ -355,6 +392,8 @@ VCRConfig <- R6::R6Class(
       self$log <- log
       self$log_opts <- log_opts
       self$filter_sensitive_data <- filter_sensitive_data
+      self$filter_request_headers  = filter_request_headers
+      self$filter_response_headers  = filter_response_headers
       self$write_disk_path <- write_disk_path
       self$verbose_errors <- verbose_errors
     },
@@ -374,6 +413,7 @@ VCRConfig <- R6::R6Class(
       cat("<vcr configuration>", sep = "\n")
       cat(paste0("  Cassette Dir: ", private$.dir), sep = "\n")
       cat(paste0("  Record: ", private$.record), sep = "\n")
+      cat(paste0("  Serialize with: ", private$.serialize_with), sep = "\n")
       cat(paste0("  URI Parser: ", private$.uri_parser), sep = "\n")
       cat(paste0("  Match Requests on: ",
         pastec(private$.match_requests_on)), sep = "\n")
