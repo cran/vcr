@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2020-12-12" />
+<meta name="date" content="2021-05-21" />
 
 <title>Configure vcr</title>
 
@@ -1572,7 +1572,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Configure vcr</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2020-12-12</h4>
+<h4 class="date">2021-05-21</h4>
 
 </div>
 
@@ -1584,16 +1584,28 @@ div.tocify {
 <pre class="r"><code>library(&quot;vcr&quot;)</code></pre>
 <p>You can also get the default configuration variables via <code>vcr_config_defaults()</code></p>
 <pre class="r"><code>vcr_config_defaults()
+#&gt; $warn_on_empty_cassette
+#&gt; [1] TRUE
+#&gt; 
+#&gt; $quiet
+#&gt; [1] TRUE
+#&gt; 
 #&gt; $verbose_errors
 #&gt; [1] FALSE
 #&gt; 
 #&gt; $write_disk_path
 #&gt; NULL
 #&gt; 
+#&gt; $filter_query_parameters
+#&gt; NULL
+#&gt; 
 #&gt; $filter_response_headers
 #&gt; NULL
 #&gt; 
 #&gt; $filter_request_headers
+#&gt; NULL
+#&gt; 
+#&gt; $filter_sensitive_data_regex
 #&gt; NULL
 #&gt; 
 #&gt; $filter_sensitive_data
@@ -1904,7 +1916,7 @@ vcr_configure(
   filter_request_headers = c(&quot;Authorization&quot;, &quot;User-Agent&quot;)
 )
 vcr_configure(
-  filter_request_headers = list(Authorization = Sys.getenv(&#39;MY_API_KEY&#39;))
+  filter_request_headers = list(Authorization = &quot;&lt;&lt;&lt;not-my-bearer-token&gt;&gt;&gt;&quot;)
 )</code></pre>
 </div>
 <div id="filter_response_headers" class="section level3">
@@ -1921,6 +1933,36 @@ vcr_configure(
 )
 vcr_configure(
   filter_response_headers = list(server = &quot;fake-server&quot;)
+)</code></pre>
+</div>
+<div id="filter_query_parameters" class="section level3">
+<h3>filter_query_parameters</h3>
+<p>Expects a character vector or a named list. If a character vector, or any unnamed element in a list, the query parameter is removed (both parameter name and value) before being written to the cassette.</p>
+<p>If a named list is passed, the name is the query parameter name and the value is the value with which to replace the real value.</p>
+<p>A response header you set to remove or replace is only removed/replaced from the cassette, and any requests using a cassette, but will still be in your crul or httr response objects on a real request that creates the cassette.</p>
+<p>Beware of your <code>match_requests_on</code> option when using this filter. If you filter out a query parameter it’s probably a bad idea to match on <code>query</code> given that there is no way for vcr to restore the exact http request from your cassette after one or more query parameters is removed or changed. One way you could filter a query parameter and still match on query or at least on the complete uri is to use replacement behavior (a named list), but instead of <code>list(a=&quot;b&quot;)</code> use two values <code>list(a=c(&quot;b&quot;,&quot;c&quot;))</code>, where “c” is the string to be stored in the cassette. You could of course replace those values with values from environment variables so that you obscure the real values if your code is public.</p>
+<p>Examples:</p>
+<pre class="r"><code># completely drop parameter &quot;user&quot;
+vcr_configure(
+  filter_query_parameters = &quot;user&quot;
+)
+# completely drop parameters &quot;user&quot; and &quot;api_key&quot;
+vcr_configure(
+  filter_query_parameters = c(&quot;user&quot;, &quot;api_key&quot;)
+)
+# replace the value of parameter &quot;api_key&quot; with &quot;fake-api-key&quot;
+# NOTE: in this case there&#39;s no way to put back any value on
+# subsequent requests, so we have to match by dropping this
+# parameter value before comparing URIs
+vcr_configure(
+  filter_query_parameters = list(api_key = &quot;fake-api-key&quot;)
+)
+# replace the value found at Sys.getenv(&quot;MY_API_KEY&quot;) of parameter
+# &quot;api_key&quot; with the value &quot;foo&quot;. When using a cassette on subsequent
+# requests, we can replace &quot;foo&quot; with the value at Sys.getenv(&quot;MY_API_KEY&quot;)
+# before doing the URI comparison
+vcr_configure(
+  filter_query_parameters = list(api_key = c(Sys.getenv(&quot;MY_API_KEY&quot;), &quot;foo&quot;))
 )</code></pre>
 </div>
 </div>

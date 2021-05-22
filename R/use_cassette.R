@@ -1,7 +1,7 @@
 #' Use a cassette to record HTTP requests
 #'
 #' @export
-#' @inheritSection check_cassette_names Cassette names
+#' @inherit check_cassette_names details
 #' @param name The name of the cassette. vcr will check this to ensure it
 #' is a valid file name. Not allowed: spaces, file extensions, control
 #' characters (e.g., `\n`), illegal characters ('/', '?', '<', '>', '\\', ':',
@@ -70,6 +70,10 @@
 #' we return with a useful message, and since we use `on.exit()`
 #' the cassette is still ejected even though there was an error,
 #' but you don't get an object back
+#' - whenever an empty cassette (a yml/json file) is found, we delete it
+#' before returning from the `use_cassette()` function call. we achieve
+#' this via use of `on.exit()` so an empty cassette is deleted even
+#' if there was an error in the code block you passed in
 #'
 #' @section Cassettes on disk:
 #' Note that _"eject"_ only means that the R session cassette is no longer
@@ -174,6 +178,11 @@ use_cassette <- function(name, ...,
   }
   on.exit(cassette$eject())
   cassette$call_block(...)
-  # force(...)
   return(cassette)
+}
+
+check_empty_cassette <- function(cas) {
+  if (!any(nzchar(readLines(cas$file())))) {
+    warning(empty_cassette_message, call. = FALSE)
+  }
 }

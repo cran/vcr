@@ -5,7 +5,7 @@ vcr__env <- new.env()
 #' @export
 #' @inheritParams use_cassette
 #' @inheritSection use_cassette Cassette options
-#' @inheritSection check_cassette_names Cassette names
+#' @inherit check_cassette_names details
 #' @seealso [use_cassette()], [eject_cassette()]
 #' @return an object of class `Cassette`
 #' @examples \dontrun{
@@ -28,7 +28,7 @@ vcr__env <- new.env()
 #' x$new_recorded_interactions # same, 1 interaction
 #' x$previously_recorded_interactions() # now not empty
 #' ## stub_registry now empty, eject() calls webmockr::disable(), which
-#' ## calls the disable method for each of crul and httr adadapters, 
+#' ## calls the disable method for each of crul and httr adadapters,
 #' ## which calls webmockr's remove_stubs() method for each adapter
 #' webmockr::stub_registry()
 #'
@@ -55,10 +55,8 @@ insert_cassette <- function(name,
     }
 
     # enable webmockr
-    webmockr::enable()
-    webmockr::webmockr_allow_net_connect()
-    # FIXME: temporary attempt to make it work: turn on mocking for httr
-    # webmockr::httr_mock()
+    webmockr::enable(quiet=vcr_c$quiet)
+    sup_mssg(vcr_c$quiet, webmockr::webmockr_allow_net_connect())
 
     # record cassete name for use in logging, etc.
     vcr__env$current_cassette <- name

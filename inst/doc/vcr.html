@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2020-12-12" />
+<meta name="date" content="2021-05-21" />
 
 <title>Introduction to vcr</title>
 
@@ -1572,7 +1572,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Introduction to vcr</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2020-12-12</h4>
+<h4 class="date">2021-05-21</h4>
 
 </div>
 
@@ -1593,7 +1593,7 @@ div.tocify {
 <li>If you want to test for package behavior when the API returns e.g. a 404 or 503 code, edit the cassettes, or use <a href="https://docs.ropensci.org/webmockr/">webmockr</a></li>
 </ul>
 <p>Now your tests can work without any internet connection!</p>
-<p><a href="https://github.com/maelle/exemplighratia/pull/2/files">Demo of adding vcr testing to an R package</a></p>
+<p><a href="https://github.com/maelle/exemplighratia/pull/2/files">Demo of adding vcr testing to an R package</a>, <a href="https://books.ropensci.org/http-testing/vcr.html">corresponding narrative</a>.</p>
 </div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
@@ -1820,10 +1820,14 @@ system.time(
 <li>log = <code>FALSE</code></li>
 <li>log_opts = <code>list(file = &quot;vcr.log&quot;, log_prefix = &quot;Cassette&quot;, date = TRUE)</code></li>
 <li>filter_sensitive_data = <code>NULL</code></li>
+<li>filter_sensitive_data_regex = <code>NULL</code></li>
 <li>filter_request_headers = <code>NULL</code></li>
 <li>filter_response_headers = <code>NULL</code></li>
+<li>filter_query_parameters = <code>NULL</code></li>
 <li>write_disk_path = <code>NULL</code></li>
 <li>verbose_errors = <code>FALSE</code></li>
+<li>quiet = <code>TRUE</code></li>
+<li>warn_on_empty_cassette = <code>TRUE</code></li>
 </ul>
 <p>You can get the defaults programmatically with</p>
 <pre class="r"><code>vcr_config_defaults()</code></pre>

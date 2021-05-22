@@ -8,7 +8,7 @@ Description: Record test suite 'HTTP' requests and replays them during
     real 'HTTP' responses on disk in 'cassettes'. Subsequent 'HTTP' requests
     matching any previous requests in the same 'cassette' use a cached
     'HTTP' response.
-Version: 0.6.0
+Version: 1.0.0
 Authors@R: c(person("Scott", "Chamberlain", role = c("aut", "cre"),
     email = "sckott@protonmail.com", 
     comment = c(ORCID="0000-0003-1444-9135")),
@@ -27,9 +27,9 @@ LazyData: true
 VignetteBuilder: knitr
 SystemRequirements: C++11
 LinkingTo: cpp11
-Imports: crul (>= 0.8.4), httr, webmockr (>= 0.7.4), urltools, yaml,
-        R6, base64enc
-Suggests: roxygen2 (>= 7.0.2), jsonlite, testthat, knitr, rmarkdown,
+Imports: crul (>= 0.8.4), httr, webmockr (>= 0.8.0), urltools, yaml,
+        R6, base64enc, rprojroot
+Suggests: roxygen2 (>= 7.1.1), jsonlite, testthat, knitr, rmarkdown,
         desc, crayon, cli, curl, withr
 X-schema.org-applicationCategory: Web
 X-schema.org-keywords: http, https, API, web-services, curl, mock,
@@ -37,11 +37,11 @@ X-schema.org-keywords: http, https, API, web-services, curl, mock,
 X-schema.org-isPartOf: https://ropensci.org
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
-Packaged: 2020-12-12 17:14:50 UTC; sckott
+Packaged: 2021-05-22 02:39:44 UTC; sckott
 Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>),
   Aaron Wolen [ctb] (<https://orcid.org/0000-0003-2542-2202>),
   Maëlle Salmon [ctb] (<https://orcid.org/0000-0002-2815-0399>),
   rOpenSci [fnd] (https://ropensci.org)
 Maintainer: Scott Chamberlain <sckott@protonmail.com>
 Repository: CRAN
-Date/Publication: 2020-12-12 17:30:02 UTC
+Date/Publication: 2021-05-22 04:50:02 UTC
