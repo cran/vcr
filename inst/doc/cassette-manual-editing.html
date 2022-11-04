@@ -14,45 +14,44 @@
 
 <title>Why and how to edit your vcr cassettes?</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -64,55 +63,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -331,203 +329,244 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Why and how to edit your vcr cassettes?</h1>
+<h1 class="title toc-ignore">Why and how to edit your vcr
+cassettes?</h1>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(vcr)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vcr)</span></code></pre></div>
 <div id="why-edit-cassettes" class="section level2">
 <h2>Why edit cassettes?</h2>
-<p>By design vcr is very good at recording HTTP interactions that actually took place. Now sometimes when testing/demo-ing your package you will want to use <em>fake</em> HTTP interactions. For instance:</p>
+<p>By design vcr is very good at recording HTTP interactions that
+actually took place. Now sometimes when testing/demo-ing your package
+you will want to use <em>fake</em> HTTP interactions. For instance:</p>
 <ul>
-<li>What happens if the web API returns a 503 code? Is there an informative error?</li>
-<li>What happens if it returns a 503 and then a 200 code? Does the retry work?</li>
-<li>What if the API returns too much data for even simple queries and you want to make your cassettes smaller?</li>
+<li>What happens if the web API returns a 503 code? Is there an
+informative error?</li>
+<li>What happens if it returns a 503 and then a 200 code? Does the retry
+work?</li>
+<li>What if the API returns too much data for even simple queries and
+you want to make your cassettes smaller?</li>
 </ul>
-<p>In all these cases, you can edit your cassettes as long as you are aware of the risks!</p>
+<p>In all these cases, you can edit your cassettes as long as you are
+aware of the risks!</p>
 </div>
 <div id="risks-related-to-cassette-editing" class="section level2">
 <h2>Risks related to cassette editing</h2>
 <ul>
-<li>If you use a vcr cassette where you replace a 200 code with a 503 code, and vcr is turned off, the test will fail because the API will probably not return an error. Use <code>vcr::skip_if_vcr_off()</code>.</li>
-<li>If you edit cassettes by hand you can’t re-record them easily, you’d need to re-record them then re-apply your edits.</li>
+<li>If you use a vcr cassette where you replace a 200 code with a 503
+code, and vcr is turned off, the test will fail because the API will
+probably not return an error. Use
+<code>vcr::skip_if_vcr_off()</code>.</li>
+<li>If you edit cassettes by hand you can’t re-record them easily, you’d
+need to re-record them then re-apply your edits.</li>
 </ul>
 <p>Therefore you’ll need to develop a good workflow.</p>
 </div>
 <div id="example-1-test-using-an-edited-cassette-with-a-503" class="section level2">
 <h2>Example 1: test using an edited cassette with a 503</h2>
 <p>First, write your test e.g.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>vcr<span class="op">::</span><span class="kw">use_cassette</span>(<span class="st">&quot;api-error&quot;</span>, {</span>
-<span id="cb2-2"><a href="#cb2-2"></a>  <span class="kw">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
-<span id="cb2-3"><a href="#cb2-3"></a>    vcr<span class="op">::</span><span class="kw">skip_if_vcr_off</span>()</span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="kw">expect_error</span>(<span class="kw">call_my_api</span>()), <span class="st">&quot;error message&quot;</span><span class="er">)</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>  })</span>
-<span id="cb2-6"><a href="#cb2-6"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>vcr<span class="sc">::</span><span class="fu">use_cassette</span>(<span class="st">&quot;api-error&quot;</span>, {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    vcr<span class="sc">::</span><span class="fu">skip_if_vcr_off</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect_error</span>(<span class="fu">call_my_api</span>()), <span class="st">&quot;error message&quot;</span><span class="er">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 <p>Then run your tests a first time.</p>
 <ol style="list-style-type: decimal">
 <li>It will fail</li>
-<li>It will have created a cassette under <code>tests/fixtures/api-error.yml</code> that looks something like</li>
+<li>It will have created a cassette under
+<code>tests/fixtures/api-error.yml</code> that looks something like</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;200&#39;</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a><span class="at">      </span><span class="fu">message</span><span class="kw">:</span><span class="at"> OK</span></span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="at">      </span><span class="fu">explanation</span><span class="kw">:</span><span class="at"> Request fulfilled, document follows</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="at">      </span><span class="fu">status</span><span class="kw">:</span><span class="at"> HTTP/1.1 200 OK</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="at">      </span><span class="fu">connection</span><span class="kw">:</span><span class="at"> keep-alive</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb3-19"><a href="#cb3-19"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> UTF-8</span></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="at">  </span><span class="fu">recorded_at</span><span class="kw">:</span><span class="at"> 2018-04-03 22:55:02 GMT</span></span>
-<span id="cb3-26"><a href="#cb3-26"></a><span class="at">  </span><span class="fu">recorded_with</span><span class="kw">:</span><span class="at"> vcr/0.1.0, webmockr/0.2.4, crul/0.5.2</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;200&#39;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">message</span><span class="kw">:</span><span class="at"> OK</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">explanation</span><span class="kw">:</span><span class="at"> Request fulfilled, document follows</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status</span><span class="kw">:</span><span class="at"> HTTP/1.1 200 OK</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">connection</span><span class="kw">:</span><span class="at"> keep-alive</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> UTF-8</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">recorded_at</span><span class="kw">:</span><span class="at"> 2018-04-03 22:55:02 GMT</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">recorded_with</span><span class="kw">:</span><span class="at"> vcr/0.1.0, webmockr/0.2.4, crul/0.5.2</span></span></code></pre></div>
 <p>You can edit to (new status code)</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;503&#39;</span></span></code></pre></div>
-<p>And run your test again, it should pass! Note the use of <code>vcr::skip_if_vcr_off()</code>: if vcr is turned off, there is a real API request and most probably this request won’t get a 503 as a status code.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;503&#39;</span></span></code></pre></div>
+<p>And run your test again, it should pass! Note the use of
+<code>vcr::skip_if_vcr_off()</code>: if vcr is turned off, there is a
+real API request and most probably this request won’t get a 503 as a
+status code.</p>
 <div id="the-same-thing-with-webmockr" class="section level3">
 <h3>The same thing with webmockr</h3>
-<p>The advantage of the approach involving editing cassettes is that you only learn one thing, which is vcr. Now, by using the webmockr directly in your tests, you can also test for the behavior of your package in case of errors. Below we assume <code>api_url()</code> returns the URL <code>call_my_api()</code> calls.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
-<span id="cb5-2"><a href="#cb5-2"></a>  webmockr<span class="op">::</span><span class="kw">enable</span>()</span>
-<span id="cb5-3"><a href="#cb5-3"></a>  stub &lt;-<span class="st"> </span>webmockr<span class="op">::</span><span class="kw">stub_request</span>(<span class="st">&quot;get&quot;</span>, <span class="kw">api_url</span>())</span>
-<span id="cb5-4"><a href="#cb5-4"></a>  webmockr<span class="op">::</span><span class="kw">to_return</span>(stub, <span class="dt">status =</span> <span class="dv">503</span>)</span>
-<span id="cb5-5"><a href="#cb5-5"></a>  <span class="kw">expect_error</span>(<span class="kw">call_my_api</span>()), <span class="st">&quot;error message&quot;</span><span class="er">)</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a>  webmockr<span class="op">::</span><span class="kw">disable</span>()</span>
-<span id="cb5-7"><a href="#cb5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8"></a>})</span></code></pre></div>
-<p>A big pro of this approach is that it works even when vcr is turned off. A con is that it’s quite different from the vcr syntax.</p>
+<p>The advantage of the approach involving editing cassettes is that you
+only learn one thing, which is vcr. Now, by using the webmockr directly
+in your tests, you can also test for the behavior of your package in
+case of errors. Below we assume <code>api_url()</code> returns the URL
+<code>call_my_api()</code> calls.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">enable</span>()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  stub <span class="ot">&lt;-</span> webmockr<span class="sc">::</span><span class="fu">stub_request</span>(<span class="st">&quot;get&quot;</span>, <span class="fu">api_url</span>())</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">to_return</span>(stub, <span class="at">status =</span> <span class="dv">503</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_error</span>(<span class="fu">call_my_api</span>()), <span class="st">&quot;error message&quot;</span><span class="er">)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">disable</span>()</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<p>A big pro of this approach is that it works even when vcr is turned
+off. A con is that it’s quite different from the vcr syntax.</p>
 </div>
 </div>
 <div id="example-2-test-using-an-edited-cassette-with-a-503-then-a-200" class="section level2">
 <h2>Example 2: test using an edited cassette with a 503 then a 200</h2>
 <p>Here we assume your package contains some sort of <a href="https://blog.r-hub.io/2020/04/07/retry-wheel/">retry</a>.</p>
 <p>First, write your test e.g.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>vcr<span class="op">::</span><span class="kw">use_cassette</span>(<span class="st">&quot;api-error&quot;</span>, {</span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="kw">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
-<span id="cb6-3"><a href="#cb6-3"></a>    vcr<span class="op">::</span><span class="kw">skip_if_vcr_off</span>()</span>
-<span id="cb6-4"><a href="#cb6-4"></a>    <span class="kw">expect_message</span>(thing &lt;-<span class="st"> </span><span class="kw">call_my_api</span>()), <span class="st">&quot;retry message&quot;</span><span class="er">)</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a>    <span class="kw">expect_s4_class</span>(thing, <span class="st">&quot;data.frame&quot;</span>)</span>
-<span id="cb6-6"><a href="#cb6-6"></a>  })</span>
-<span id="cb6-7"><a href="#cb6-7"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>vcr<span class="sc">::</span><span class="fu">use_cassette</span>(<span class="st">&quot;api-error&quot;</span>, {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    vcr<span class="sc">::</span><span class="fu">skip_if_vcr_off</span>()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect_message</span>(thing <span class="ot">&lt;-</span> <span class="fu">call_my_api</span>()), <span class="st">&quot;retry message&quot;</span><span class="er">)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect_s4_class</span>(thing, <span class="st">&quot;data.frame&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 <p>Then run your tests a first time.</p>
 <ol style="list-style-type: decimal">
 <li>It will fail</li>
-<li>It will have created a cassette under <code>tests/fixtures/api-error.yml</code> that looks something like</li>
+<li>It will have created a cassette under
+<code>tests/fixtures/api-error.yml</code> that looks something like</li>
 </ol>
-<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;200&#39;</span></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="at">      </span><span class="fu">message</span><span class="kw">:</span><span class="at"> OK</span></span>
-<span id="cb7-14"><a href="#cb7-14"></a><span class="at">      </span><span class="fu">explanation</span><span class="kw">:</span><span class="at"> Request fulfilled, document follows</span></span>
-<span id="cb7-15"><a href="#cb7-15"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb7-16"><a href="#cb7-16"></a><span class="at">      </span><span class="fu">status</span><span class="kw">:</span><span class="at"> HTTP/1.1 200 OK</span></span>
-<span id="cb7-17"><a href="#cb7-17"></a><span class="at">      </span><span class="fu">connection</span><span class="kw">:</span><span class="at"> keep-alive</span></span>
-<span id="cb7-18"><a href="#cb7-18"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb7-19"><a href="#cb7-19"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> UTF-8</span></span>
-<span id="cb7-20"><a href="#cb7-20"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
-<span id="cb7-21"><a href="#cb7-21"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
-<span id="cb7-22"><a href="#cb7-22"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
-<span id="cb7-23"><a href="#cb7-23"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
-<span id="cb7-24"><a href="#cb7-24"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span></span>
-<span id="cb7-25"><a href="#cb7-25"></a><span class="at">  </span><span class="fu">recorded_at</span><span class="kw">:</span><span class="at"> 2018-04-03 22:55:02 GMT</span></span>
-<span id="cb7-26"><a href="#cb7-26"></a><span class="at">  </span><span class="fu">recorded_with</span><span class="kw">:</span><span class="at"> vcr/0.1.0, webmockr/0.2.4, crul/0.5.2</span></span></code></pre></div>
-<p>You can duplicate the HTTP interaction, and make the first one return a 503 status code. vcr will first use the first interaction, then the second one, when making the same request.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb8-6"><a href="#cb8-6"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb8-7"><a href="#cb8-7"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb8-9"><a href="#cb8-9"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
-<span id="cb8-10"><a href="#cb8-10"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;503&#39;</span></span>
-<span id="cb8-13"><a href="#cb8-13"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
-<span id="cb8-14"><a href="#cb8-14"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
-<span id="cb8-15"><a href="#cb8-15"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
-<span id="cb8-16"><a href="#cb8-16"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb8-17"><a href="#cb8-17"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb8-18"><a href="#cb8-18"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
-<span id="cb8-19"><a href="#cb8-19"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb8-20"><a href="#cb8-20"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
-<span id="cb8-21"><a href="#cb8-21"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
-<span id="cb8-22"><a href="#cb8-22"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
-<span id="cb8-23"><a href="#cb8-23"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;200&#39;</span></span>
-<span id="cb8-24"><a href="#cb8-24"></a><span class="at">      </span><span class="fu">message</span><span class="kw">:</span><span class="at"> OK</span></span>
-<span id="cb8-25"><a href="#cb8-25"></a><span class="at">      </span><span class="fu">explanation</span><span class="kw">:</span><span class="at"> Request fulfilled, document follows</span></span>
-<span id="cb8-26"><a href="#cb8-26"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
-<span id="cb8-27"><a href="#cb8-27"></a><span class="at">      </span><span class="fu">status</span><span class="kw">:</span><span class="at"> HTTP/1.1 200 OK</span></span>
-<span id="cb8-28"><a href="#cb8-28"></a><span class="at">      </span><span class="fu">connection</span><span class="kw">:</span><span class="at"> keep-alive</span></span>
-<span id="cb8-29"><a href="#cb8-29"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
-<span id="cb8-30"><a href="#cb8-30"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> UTF-8</span></span>
-<span id="cb8-31"><a href="#cb8-31"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
-<span id="cb8-32"><a href="#cb8-32"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
-<span id="cb8-33"><a href="#cb8-33"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
-<span id="cb8-34"><a href="#cb8-34"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
-<span id="cb8-35"><a href="#cb8-35"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span></span>
-<span id="cb8-36"><a href="#cb8-36"></a><span class="at">  </span><span class="fu">recorded_at</span><span class="kw">:</span><span class="at"> 2018-04-03 22:55:02 GMT</span></span>
-<span id="cb8-37"><a href="#cb8-37"></a><span class="at">  </span><span class="fu">recorded_with</span><span class="kw">:</span><span class="at"> vcr/0.1.0, webmockr/0.2.4, crul/0.5.2</span></span></code></pre></div>
-<p>And run your test again, it should pass! Note the use of <code>vcr::skip_if_vcr_off()</code>: if vcr is turned off, there is a real API request and most probably this request won’t get a 503 as a status code.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;200&#39;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">message</span><span class="kw">:</span><span class="at"> OK</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">explanation</span><span class="kw">:</span><span class="at"> Request fulfilled, document follows</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status</span><span class="kw">:</span><span class="at"> HTTP/1.1 200 OK</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">connection</span><span class="kw">:</span><span class="at"> keep-alive</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> UTF-8</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">recorded_at</span><span class="kw">:</span><span class="at"> 2018-04-03 22:55:02 GMT</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">recorded_with</span><span class="kw">:</span><span class="at"> vcr/0.1.0, webmockr/0.2.4, crul/0.5.2</span></span></code></pre></div>
+<p>You can duplicate the HTTP interaction, and make the first one return
+a 503 status code. vcr will first use the first interaction, then the
+second one, when making the same request.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">http_interactions</span><span class="kw">:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;503&#39;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">request</span><span class="kw">:</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> get</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">uri</span><span class="kw">:</span><span class="at"> https://eu.httpbin.org/get</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">User-Agent</span><span class="kw">:</span><span class="at"> libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">response</span><span class="kw">:</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">status</span><span class="kw">:</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status_code</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;200&#39;</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">message</span><span class="kw">:</span><span class="at"> OK</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">explanation</span><span class="kw">:</span><span class="at"> Request fulfilled, document follows</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">headers</span><span class="kw">:</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">status</span><span class="kw">:</span><span class="at"> HTTP/1.1 200 OK</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">connection</span><span class="kw">:</span><span class="at"> keep-alive</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">body</span><span class="kw">:</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">encoding</span><span class="kw">:</span><span class="at"> UTF-8</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">string</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">recorded_at</span><span class="kw">:</span><span class="at"> 2018-04-03 22:55:02 GMT</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">recorded_with</span><span class="kw">:</span><span class="at"> vcr/0.1.0, webmockr/0.2.4, crul/0.5.2</span></span></code></pre></div>
+<p>And run your test again, it should pass! Note the use of
+<code>vcr::skip_if_vcr_off()</code>: if vcr is turned off, there is a
+real API request and most probably this request won’t get a 503 as a
+status code.</p>
 <div id="the-same-thing-with-webmockr-1" class="section level3">
 <h3>The same thing with webmockr</h3>
-<p>The advantage of the approach involving editing cassettes is that you only learn one thing, which is vcr. Now, by using the webmockr directly in your tests, you can also test for the behavior of your package in case of errors. Below we assume <code>api_url()</code> returns the URL <code>call_my_api()</code> calls.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
-<span id="cb9-2"><a href="#cb9-2"></a>  webmockr<span class="op">::</span><span class="kw">enable</span>()</span>
-<span id="cb9-3"><a href="#cb9-3"></a>  stub &lt;-<span class="st"> </span>webmockr<span class="op">::</span><span class="kw">stub_request</span>(<span class="st">&quot;get&quot;</span>, <span class="kw">api_url</span>())</span>
-<span id="cb9-4"><a href="#cb9-4"></a>  stub <span class="op">%&gt;%</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="st">  </span><span class="kw">to_return</span>(<span class="dt">status =</span> <span class="dv">503</span>)  <span class="op">%&gt;%</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a><span class="st">  </span><span class="kw">to_return</span>(<span class="dt">status =</span> <span class="dv">200</span>, <span class="dt">body =</span> <span class="st">&quot;{</span><span class="ch">\n</span><span class="st">  </span><span class="ch">\&quot;</span><span class="st">args</span><span class="ch">\&quot;</span><span class="st">: {}, </span><span class="ch">\n</span><span class="st">  </span><span class="ch">\&quot;</span><span class="st">headers</span><span class="ch">\&quot;</span><span class="st">: {</span><span class="ch">\n</span><span class="st">    </span><span class="ch">\&quot;</span><span class="st">Accept</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">application/json,</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="st">        text/xml, application/xml, */*</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\n</span><span class="st">    </span><span class="ch">\&quot;</span><span class="st">Accept-Encoding</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">gzip, deflate</span><span class="ch">\&quot;</span><span class="st">,</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a><span class="st">        </span><span class="ch">\n</span><span class="st">    </span><span class="ch">\&quot;</span><span class="st">Connection</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">close</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\n</span><span class="st">    </span><span class="ch">\&quot;</span><span class="st">Host</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">httpbin.org</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\n</span><span class="st">    </span><span class="ch">\&quot;</span><span class="st">User-Agent</span><span class="ch">\&quot;</span><span class="st">:</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a><span class="st">        </span><span class="ch">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="ch">\&quot;\n</span><span class="st">  }, </span><span class="ch">\n</span><span class="st">  </span><span class="ch">\&quot;</span><span class="st">origin</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">111.222.333.444</span><span class="ch">\&quot;</span><span class="st">,</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a><span class="st">        </span><span class="ch">\n</span><span class="st">  </span><span class="ch">\&quot;</span><span class="st">url</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="ch">\&quot;\n</span><span class="st">}</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">headers =</span> <span class="kw">list</span>(<span class="dt">b =</span> <span class="dv">6</span>))</span>
-<span id="cb9-11"><a href="#cb9-11"></a>  <span class="kw">expect_message</span>(thing &lt;-<span class="st"> </span><span class="kw">call_my_api</span>()), <span class="st">&quot;retry message&quot;</span><span class="er">)</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a>    <span class="kw">expect_s4_class</span>(thing, <span class="st">&quot;data.frame&quot;</span>)</span>
-<span id="cb9-13"><a href="#cb9-13"></a>  webmockr<span class="op">::</span><span class="kw">disable</span>()</span>
-<span id="cb9-14"><a href="#cb9-14"></a></span>
-<span id="cb9-15"><a href="#cb9-15"></a>})</span></code></pre></div>
-<p>The pro of this approach is the elegance of the stubbing, with the two different responses. Each webmockr function like <code>to_return()</code> even has an argument <code>times</code> indicating the number of times the given response should be returned.</p>
-<p>The con is that on top of being different from vcr, in this case where we also needed a good response in the end (the one with a 200 code, and an actual body), writing the mock is much more cumbersome than just recording a vcr cassette.</p>
+<p>The advantage of the approach involving editing cassettes is that you
+only learn one thing, which is vcr. Now, by using the webmockr directly
+in your tests, you can also test for the behavior of your package in
+case of errors. Below we assume <code>api_url()</code> returns the URL
+<code>call_my_api()</code> calls.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">enable</span>()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  stub <span class="ot">&lt;-</span> webmockr<span class="sc">::</span><span class="fu">stub_request</span>(<span class="st">&quot;get&quot;</span>, <span class="fu">api_url</span>())</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  stub <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">to_return</span>(<span class="at">status =</span> <span class="dv">503</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">to_return</span>(<span class="at">status =</span> <span class="dv">200</span>, <span class="at">body =</span> <span class="st">&quot;{</span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">args</span><span class="sc">\&quot;</span><span class="st">: {}, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">headers</span><span class="sc">\&quot;</span><span class="st">: {</span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">application/json,</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">        text/xml, application/xml, */*</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Accept-Encoding</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">gzip, deflate</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Connection</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">close</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">Host</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">httpbin.org</span><span class="sc">\&quot;</span><span class="st">, </span><span class="sc">\n</span><span class="st">    </span><span class="sc">\&quot;</span><span class="st">User-Agent</span><span class="sc">\&quot;</span><span class="st">:</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\&quot;</span><span class="st">libcurl/7.54.0 r-curl/3.2 crul/0.5.2</span><span class="sc">\&quot;\n</span><span class="st">  }, </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">origin</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">111.222.333.444</span><span class="sc">\&quot;</span><span class="st">,</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="st">        </span><span class="sc">\n</span><span class="st">  </span><span class="sc">\&quot;</span><span class="st">url</span><span class="sc">\&quot;</span><span class="st">: </span><span class="sc">\&quot;</span><span class="st">https://eu.httpbin.org/get</span><span class="sc">\&quot;\n</span><span class="st">}</span><span class="sc">\n</span><span class="st">&quot;</span>, <span class="at">headers =</span> <span class="fu">list</span>(<span class="at">b =</span> <span class="dv">6</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_message</span>(thing <span class="ot">&lt;-</span> <span class="fu">call_my_api</span>()), <span class="st">&quot;retry message&quot;</span><span class="er">)</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect_s4_class</span>(thing, <span class="st">&quot;data.frame&quot;</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">disable</span>()</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<p>The pro of this approach is the elegance of the stubbing, with the
+two different responses. Each webmockr function like
+<code>to_return()</code> even has an argument <code>times</code>
+indicating the number of times the given response should be
+returned.</p>
+<p>The con is that on top of being different from vcr, in this case
+where we also needed a good response in the end (the one with a 200
+code, and an actual body), writing the mock is much more cumbersome than
+just recording a vcr cassette.</p>
 </div>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>In this vignette we saw why and how to edit your vcr cassettes. We also presented approaches that use webmockr instead of vcr for mocking API responses. We mentioned editing cassettes by hand but you could also write a script using the <code>yaml</code> or <code>jsonlite</code> package to edit your YAML/JSON cassettes programmatically.</p>
+<p>In this vignette we saw why and how to edit your vcr cassettes. We
+also presented approaches that use webmockr instead of vcr for mocking
+API responses. We mentioned editing cassettes by hand but you could also
+write a script using the <code>yaml</code> or <code>jsonlite</code>
+package to edit your YAML/JSON cassettes programmatically.</p>
 </div>
 
 

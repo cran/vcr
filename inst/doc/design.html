@@ -14,31 +14,29 @@
 
 <title>Design of vcr</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 
@@ -241,26 +239,55 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>This section explains <code>vcr</code>’s internal design and architecture.</p>
+<p>This section explains <code>vcr</code>’s internal design and
+architecture.</p>
 <div id="where-vcr-comes-from-and-why-r6" class="section level3">
 <h3>Where vcr comes from and why R6</h3>
-<p><code>vcr</code> was “ported” from the Ruby gem (aka, library) of the same name<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. Because it was ported from Ruby, an object-oriented programming language I thought it would be easier to use an object system in R that most closely resemble that used in Ruby (at least in my opinion). This thinking lead to choosing <a href="https://adv-r.hadley.nz/r6.html">R6</a>. The exported functions users interact with are not R6 classes, but are rather normal R functions. However, most of the internal code in the package uses R6. Thus, familiarity with R6 is important for people that may want to contribute to <code>vcr</code>, but not required at all for <code>vcr</code> users.</p>
+<p><code>vcr</code> was “ported” from the Ruby gem (aka, library) of the
+same name<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. Because it was ported from Ruby, an
+object-oriented programming language I thought it would be easier to use
+an object system in R that most closely resemble that used in Ruby (at
+least in my opinion). This thinking lead to choosing <a href="https://adv-r.hadley.nz/r6.html">R6</a>. The exported functions
+users interact with are not R6 classes, but are rather normal R
+functions. However, most of the internal code in the package uses R6.
+Thus, familiarity with R6 is important for people that may want to
+contribute to <code>vcr</code>, but not required at all for
+<code>vcr</code> users.</p>
 </div>
 <div id="principles" class="section level3">
 <h3>Principles</h3>
 <div id="an-easy-to-use-interface-hides-complexity" class="section level4">
 <h4>An easy to use interface hides complexity</h4>
-<p>As described above, <code>vcr</code> uses R6 internally, but users interact with normal R functions. Internal functions that are quite complicated are largely R6 while exported, simpler functions users interact with are normal R functions.</p>
+<p>As described above, <code>vcr</code> uses R6 internally, but users
+interact with normal R functions. Internal functions that are quite
+complicated are largely R6 while exported, simpler functions users
+interact with are normal R functions.</p>
 </div>
 <div id="classfunction-names-are-inherited-from-ruby-vcr" class="section level4">
 <h4>Class/function names are inherited from Ruby vcr</h4>
-<p>Since R <code>vcr</code> was ported from Ruby, we kept most of the names of functions/classes and variables. So if you’re wondering about why a function, class, or variable has a particular name, its derivation can not be found out in this package, for the most part that is.</p>
+<p>Since R <code>vcr</code> was ported from Ruby, we kept most of the
+names of functions/classes and variables. So if you’re wondering about
+why a function, class, or variable has a particular name, its derivation
+can not be found out in this package, for the most part that is.</p>
 </div>
 <div id="hooks-into-http-clients" class="section level4">
 <h4>Hooks into HTTP clients</h4>
-<p>Perhaps the most fundamental thing about that this package work is how it knows what HTTP requests are being made. This stumped me for quite a long time. When looking at Ruby vcr, at first I thought it must be “listening” for HTTP requests somehow. Then I found out about <a href="https://en.wikipedia.org/wiki/Monkey_patch">monkey patching</a> (see also <a href="https://culttt.com/2015/06/17/what-is-monkey-patching-in-ruby/">this blog post as a good summary</a>); that’s how it’s achieved in Ruby. That is, the Ruby vcr package literally overrides certain methods in Ruby HTTP clients, hijacking internals of the HTTP clients.</p>
-<p>However, monkey patching is not allowed in R. Thus, in R we have to somehow have “hooks” into HTTP clients in R. Fortunately, Scott is the maintainer of one of the HTTP clients, <code>crul</code>, so was able to quickly create a hook. Very fortunately, there was already a hook mechanism in the <code>httr</code> package.</p>
-<p>The actual hooks are not in <code>vcr</code>, but in <code>webmockr</code>. <code>vcr</code> depends on <code>webmockr</code> for hooking into HTTP clients <code>httr</code> and <code>crul</code>.</p>
+<p>Perhaps the most fundamental thing about that this package work is
+how it knows what HTTP requests are being made. This stumped me for
+quite a long time. When looking at Ruby vcr, at first I thought it must
+be “listening” for HTTP requests somehow. Then I found out about <a href="https://en.wikipedia.org/wiki/Monkey_patch">monkey patching</a>;
+that’s how it’s achieved in Ruby. That is, the Ruby vcr package
+literally overrides certain methods in Ruby HTTP clients, hijacking
+internals of the HTTP clients.</p>
+<p>However, monkey patching is not allowed in R. Thus, in R we have to
+somehow have “hooks” into HTTP clients in R. Fortunately, Scott is the
+maintainer of one of the HTTP clients, <code>crul</code>, so was able to
+quickly create a hook. Very fortunately, there was already a hook
+mechanism in the <code>httr</code> package.</p>
+<p>The actual hooks are not in <code>vcr</code>, but in
+<code>webmockr</code>. <code>vcr</code> depends on <code>webmockr</code>
+for hooking into HTTP clients <code>httr</code> and
+<code>crul</code>.</p>
 </div>
 </div>
 <div id="internal-classes" class="section level3">
@@ -268,49 +295,99 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>An overview of some of the more important aspects of vcr.</p>
 <div id="configuration" class="section level4">
 <h4>Configuration</h4>
-<p>An internal object (<code>vcr_c</code>) is created when <code>vcr</code> is loaded with the default vcr configuration options inside of an R6 class <code>VCRConfig</code> - see <a href="https://github.com/ropensci/vcr/blob/master/R/onLoad.R" class="uri">https://github.com/ropensci/vcr/blob/master/R/onLoad.R</a>. This class is keeps track of default and user specified configuration options. You can access <code>vcr_c</code> using triple namespace <code>:::</code>, though it is not intended for general use. Whenever you make calls to <code>vcr_configure()</code> or other configuration functions, <code>vcr_c</code> is affected.</p>
+<p>An internal object (<code>vcr_c</code>) is created when
+<code>vcr</code> is loaded with the default vcr configuration options
+inside of an R6 class <code>VCRConfig</code> - see <a href="https://github.com/ropensci/vcr/blob/master/R/onLoad.R" class="uri">https://github.com/ropensci/vcr/blob/master/R/onLoad.R</a>.
+This class is keeps track of default and user specified configuration
+options. You can access <code>vcr_c</code> using triple namespace
+<code>:::</code>, though it is not intended for general use. Whenever
+you make calls to <code>vcr_configure()</code> or other configuration
+functions, <code>vcr_c</code> is affected.</p>
 </div>
 <div id="cassette-class" class="section level4">
 <h4>Cassette class</h4>
-<p><code>Cassette</code> is an R6 class that handles internals/state for each cassette. Each time you run <code>use_cassette()</code> this class is used. The class has quite a few methods in it, so there’s a lot going on in the class. Ideally the class would be separated into subclasses to handle similar sets of logic, but there’s not an easy way to do that with R6.</p>
-<p>Of note in <code>Cassette</code> is that when called, within the <code>initialize()</code> call <code>webmockr</code> is used to create webmockr stubs.</p>
+<p><code>Cassette</code> is an R6 class that handles internals/state for
+each cassette. Each time you run <code>use_cassette()</code> this class
+is used. The class has quite a few methods in it, so there’s a lot going
+on in the class. Ideally the class would be separated into subclasses to
+handle similar sets of logic, but there’s not an easy way to do that
+with R6.</p>
+<p>Of note in <code>Cassette</code> is that when called, within the
+<code>initialize()</code> call <code>webmockr</code> is used to create
+webmockr stubs.</p>
 </div>
 <div id="how-http-requests-are-handled" class="section level4">
 <h4>How HTTP requests are handled</h4>
-<p>Within <code>webmockr</code>, there are calls to the vcr class <code>RequestHandler</code>, which has child classes <code>RequestHandlerCrul</code> and <code>RequestHandlerHttr</code> for <code>crul</code> and <code>httr</code>, respectively. These classes determine what to do with each HTTP request. The options for each HTTP request include:</p>
+<p>Within <code>webmockr</code>, there are calls to the vcr class
+<code>RequestHandler</code>, which has child classes
+<code>RequestHandlerCrul</code> and <code>RequestHandlerHttr</code> for
+<code>crul</code> and <code>httr</code>, respectively. These classes
+determine what to do with each HTTP request. The options for each HTTP
+request include:</p>
 <ul>
-<li><strong>Ignored</strong> You can ignore HTTP requests under certain rules using the configuration options <code>ignore_hosts</code> and <code>ignore_localhost</code></li>
-<li><strong>Stubbed by vcr</strong> This is an HTTP request for which a match is found in the cassette defined in the <code>use_cassette()</code>/<code>insert_cassette()</code> call. In this case the matching request/response from the cassette is returned with no real HTTP request allowed.</li>
-<li><strong>Recordable</strong> This is an HTTP request for which no match is found in the cassette defined in the <code>use_cassette()</code>/<code>insert_cassette()</code> call. In this case a real HTTP request is allowed, and the request/response is recorded to the cassette.</li>
-<li><strong>Unhandled</strong> This is a group of cases, all of which cause an error to be thrown with a message trying to help the user figure out how to fix the problem.</li>
+<li><strong>Ignored</strong> You can ignore HTTP requests under certain
+rules using the configuration options <code>ignore_hosts</code> and
+<code>ignore_localhost</code></li>
+<li><strong>Stubbed by vcr</strong> This is an HTTP request for which a
+match is found in the cassette defined in the
+<code>use_cassette()</code>/<code>insert_cassette()</code> call. In this
+case the matching request/response from the cassette is returned with no
+real HTTP request allowed.</li>
+<li><strong>Recordable</strong> This is an HTTP request for which no
+match is found in the cassette defined in the
+<code>use_cassette()</code>/<code>insert_cassette()</code> call. In this
+case a real HTTP request is allowed, and the request/response is
+recorded to the cassette.</li>
+<li><strong>Unhandled</strong> This is a group of cases, all of which
+cause an error to be thrown with a message trying to help the user
+figure out how to fix the problem.</li>
 </ul>
-<p>If you use <a href="https://docs.ropensci.org/vcr/articles/debugging.html?q=logging#logging-1">vcr logging</a> you’ll see these categories in your logs.</p>
+<p>If you use <a href="https://docs.ropensci.org/vcr/articles/debugging.html?q=logging#logging-1">vcr
+logging</a> you’ll see these categories in your logs.</p>
 </div>
 <div id="serializers" class="section level4">
 <h4>Serializers</h4>
-<p>Serializers handle in what format cassettes are written to files on disk. The current options are YAML (default) and JSON. YAML was implemented first in <code>vcr</code> because that’s the default option in Ruby vcr.</p>
-<p>An R6 class <code>Serializer</code> is the parent class for all serializer types; <code>YAML</code> and <code>JSON</code> are both R6 classes that inherit from <code>Serializer</code>. Both <code>YAML</code> and <code>JSON</code> define just two methods: <code>serialize()</code> and <code>deserialize()</code> for converting R structures to yaml or json, and converting yaml or json back to R structures, respectively.</p>
+<p>Serializers handle in what format cassettes are written to files on
+disk. The current options are YAML (default) and JSON. YAML was
+implemented first in <code>vcr</code> because that’s the default option
+in Ruby vcr.</p>
+<p>An R6 class <code>Serializer</code> is the parent class for all
+serializer types; <code>YAML</code> and <code>JSON</code> are both R6
+classes that inherit from <code>Serializer</code>. Both
+<code>YAML</code> and <code>JSON</code> define just two methods:
+<code>serialize()</code> and <code>deserialize()</code> for converting R
+structures to yaml or json, and converting yaml or json back to R
+structures, respectively.</p>
 </div>
 </div>
 <div id="environments" class="section level3">
 <h3>Environments</h3>
 <div id="logging" class="section level4">
 <h4>Logging</h4>
-<p>An internal environment (<code>vcr_log_env</code>) is used when you use logging. At this point it only keeps track of one variable - <code>file</code> - to be able to refer to what file is used for logging across many classes/functions that need to write to the log file.</p>
+<p>An internal environment (<code>vcr_log_env</code>) is used when you
+use logging. At this point it only keeps track of one variable -
+<code>file</code> - to be able to refer to what file is used for logging
+across many classes/functions that need to write to the log file.</p>
 </div>
 <div id="a-bit-of-housekeeping" class="section level4">
 <h4>A bit of housekeeping</h4>
-<p>Another internal environment (<code>vcr__env</code>) is used to keep track of a few items, including the current cassette in use, and the last vcr error.</p>
+<p>Another internal environment (<code>vcr__env</code>) is used to keep
+track of a few items, including the current cassette in use, and the
+last vcr error.</p>
 </div>
 <div id="lightswitch" class="section level4">
 <h4>Lightswitch</h4>
-<p>Another internal environment (<code>light_switch</code>) is used to keep track of users turning on and off <code>vcr</code>. See <code>?lightswitch</code>.</p>
+<p>Another internal environment (<code>light_switch</code>) is used to
+keep track of users turning on and off <code>vcr</code>. See
+<code>?lightswitch</code>.</p>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>The first version of Ruby’s vcr was released in February 2010 <a href="https://rubygems.org/gems/vcr/versions/0.1.0" class="uri">https://rubygems.org/gems/vcr/versions/0.1.0</a>. Ruby vcr source code: <a href="https://github.com/vcr/vcr/" class="uri">https://github.com/vcr/vcr/</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>The first version of Ruby’s vcr was released in February
+2010 <a href="https://rubygems.org/gems/vcr/versions/0.1.0" class="uri">https://rubygems.org/gems/vcr/versions/0.1.0</a>. Ruby vcr
+source code: <a href="https://github.com/vcr/vcr/" class="uri">https://github.com/vcr/vcr/</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

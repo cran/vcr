@@ -19,8 +19,7 @@ This function, similar to \code{testthat::test_path()}, is designed to work both
 interactively and during tests, locating files in the \verb{tests/} directory.
 }
 \note{
-Beware if you have more than one \code{tests} directories in your package
-root. This may not work as intended if that is the case.
+\code{vcr_test_path()} assumes you are using testthat for your unit tests.
 }
 \examples{
 if (interactive()) {
