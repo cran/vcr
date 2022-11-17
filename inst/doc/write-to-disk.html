@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2022-11-04" />
+<meta name="date" content="2022-11-17" />
 
 <title>Mocking writing to disk</title>
 
@@ -1505,7 +1505,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Mocking writing to disk</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2022-11-04</h4>
+<h4 class="date">2022-11-17</h4>
 
 </div>
 
@@ -1525,7 +1525,7 @@ vcr_configure(
   write_disk_path = file.path(tmpdir, &quot;files&quot;)
 )
 #&gt; &lt;vcr configuration&gt;
-#&gt;   Cassette Dir: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//RtmpY39OFZ/fixtures
+#&gt;   Cassette Dir: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//Rtmp4TMUvK/fixtures
 #&gt;   Record: new_episodes
 #&gt;   Serialize with: yaml
 #&gt;   URI Parser: urltools::url_parse
@@ -1534,7 +1534,7 @@ vcr_configure(
 #&gt;   Logging?: FALSE
 #&gt;   ignored hosts: google.com
 #&gt;   ignore localhost?: TRUE
-#&gt;   Write disk path: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//RtmpY39OFZ/files</code></pre>
+#&gt;   Write disk path: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//Rtmp4TMUvK/files</code></pre>
 <p>Then pass a file path (that doesn’t exist yet) to crul’s
 <code>disk</code> parameter. <code>vcr</code> will take care of handling
 writing the response to that file in addition to the cassette.</p>
@@ -1548,7 +1548,7 @@ cas &lt;- use_cassette(&quot;test_write_to_disk&quot;, {
 file.exists(out$content)
 #&gt; [1] TRUE
 out$parse()
-#&gt; [1] &quot;{\n  \&quot;args\&quot;: {}, \n  \&quot;headers\&quot;: {\n    \&quot;Accept\&quot;: \&quot;application/json, text/xml, application/xml, */*\&quot;, \n    \&quot;Accept-Encoding\&quot;: \&quot;gzip, deflate\&quot;, \n    \&quot;Host\&quot;: \&quot;httpbin.org\&quot;, \n    \&quot;User-Agent\&quot;: \&quot;libcurl/7.79.1 r-curl/4.3.2 crul/1.2.1.99\&quot;, \n    \&quot;X-Amzn-Trace-Id\&quot;: \&quot;Root=1-63651914-5d207a31240260aa18195a5d\&quot;\n  }, \n  \&quot;origin\&quot;: \&quot;24.21.229.59\&quot;, \n  \&quot;url\&quot;: \&quot;https://httpbin.org/get\&quot;\n}\n&quot;</code></pre>
+#&gt; [1] &quot;{\n  \&quot;args\&quot;: {}, \n  \&quot;headers\&quot;: {\n    \&quot;Accept\&quot;: \&quot;application/json, text/xml, application/xml, */*\&quot;, \n    \&quot;Accept-Encoding\&quot;: \&quot;gzip, deflate\&quot;, \n    \&quot;Host\&quot;: \&quot;httpbin.org\&quot;, \n    \&quot;User-Agent\&quot;: \&quot;libcurl/7.79.1 r-curl/4.3.3 crul/1.3\&quot;, \n    \&quot;X-Amzn-Trace-Id\&quot;: \&quot;Root=1-63768237-767513282b96cce164ea31b6\&quot;\n  }, \n  \&quot;origin\&quot;: \&quot;24.21.229.59\&quot;, \n  \&quot;url\&quot;: \&quot;https://httpbin.org/get\&quot;\n}\n&quot;</code></pre>
 <p>This also works with <code>httr</code>. The only difference is that
 you write to disk with a function <code>httr::write_disk(path)</code>
 rather than a parameter.</p>

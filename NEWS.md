@@ -1,18 +1,35 @@
+vcr 1.2.0
+=========
+
+### NEW FEATURES
+
+* Added @dpprdan as an author; changed all ctb to aut (#258)
+
+### MINOR IMPROVEMENTS
+
+* `use_vcr()` now creates a test helper file called `helper-vcr.R` instead of `setup-pkgname.R`. 
+  We are reverting the change from version 0.6.0 and now recommend the use of `helper-*.R` again, so that the vcr setup [is loaded with `devtools::load_all()`](https://testthat.r-lib.org/reference/test_dir.html#special-files). 
+  That way your vcr-enabled tests also work when run interactively (#244) (#256)
+* default git branch changed from master to main (#253)
+* update example packages in the README (#257)
+* vcr no longer requires compilation because replaced the single C++ function with a pure R equivalent
+
+### BUG FIXES
+
+* roll back a change from the previous CRAN version that removed use of an internal function (`body_from`) (#249) (#252)
+
 vcr 1.1.0
 =========
 
 ### MINOR IMPROVEMENTS
 
 * request matching was sensitive to escaping special characters, that's been fixed (#240) (#247) thanks to @KevCaz
-* `vcr_test_path` fix so that it looks for the `testthat` dir instead of `tests` (#242) (#243) thanks to @dpprdan
 * fix broken link given in error suggestion (#239) thanks to @maelle
-
-vcr 1.0.3
-=========
+* using `preserve_exact_body_bytes = TRUE` now writes a base64 encoded string into a field in yaml or json on disk called `base64_string`. When `preserve_exact_body_bytes = FALSE` (the default) the response body goes into a field called `string`
 
 ### BUG FIXES
 
-* fix to `vcr_test_path()` to find root package path correctly with R 4.2 on Windows (#242) (#243)
+* `vcr_test_path` fix to find root package path correctly with R 4.2 on Windows (#242) (#243) thanks to @dpprdan
 
 vcr 1.0.2
 =========
@@ -187,7 +204,7 @@ vcr 0.2.6
 ## NEW FEATURES
 
 * gains function `use_vcr()` to setup `vcr` for your package. This requires 3 pkgs all in Suggests; so are not required if you don't need to use `use_vcr()` (#52) (#95) thanks @maelle for the feedback!
-* `vcr` actually supports all four recording modes: `none`, `once`, `new_episodes`, and `all`. `once` is what's used by default. See `?recording` for description of the recording modes. For now [the test file test-ause_cassette_record_modes.R](https://github.com/ropensci/vcr/blob/master/tests/testthat/test-ause_cassette_record_modes.R) gives some examples and what to expect for each record mode; in the future the http testing book will have much more information in the _Record modes_ chapter <https://books.ropensci.org/http-testing/record-modes.html> ([commit](https://github.com/ropensci/vcr/commit/04aa5f784b18308d8f62d1b6b0be2f3e140f2a5a))
+* `vcr` actually supports all four recording modes: `none`, `once`, `new_episodes`, and `all`. `once` is what's used by default. See `?recording` for description of the recording modes. For now [the test file test-ause_cassette_record_modes.R](https://github.com/ropensci/vcr/blob/main/tests/testthat/test-ause_cassette_record_modes.R) gives some examples and what to expect for each record mode; in the future the http testing book will have much more information in the _Record modes_ chapter <https://books.ropensci.org/http-testing/record-modes.html> ([commit](https://github.com/ropensci/vcr/commit/04aa5f784b18308d8f62d1b6b0be2f3e140f2a5a))
 
 ### MINOR IMPROVEMENTS
 

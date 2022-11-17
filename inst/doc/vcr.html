@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2022-11-04" />
+<meta name="date" content="2022-11-17" />
 
 <title>Introduction to vcr</title>
 
@@ -1505,7 +1505,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Introduction to vcr</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2022-11-04</h4>
+<h4 class="date">2022-11-17</h4>
 
 </div>
 
@@ -1565,7 +1565,7 @@ narrative</a>.</p>
 <li>add an example test file for <code>vcr</code></li>
 <li>make a <code>.gitattributes</code> file with settings for
 <code>vcr</code></li>
-<li>make a <code>./tests/testthat/setup-vcr.R</code> file</li>
+<li>make a <code>./tests/testthat/helper-vcr.R</code> file</li>
 </ul>
 <p>What you will see in the R console:</p>
 <pre><code>◉ Using package: vcr.example  
@@ -1574,7 +1574,7 @@ narrative</a>.</p>
 ✓ Creating directory: ./tests/testthat  
 ◉ Looking for testthat.R file or similar  
 ✓ tests/testthat.R: added  
-✓ Adding vcr config to tests/testthat/setup-vcr.example.R  
+✓ Adding vcr config to tests/testthat/helper-vcr.example.R  
 ✓ Adding example test file tests/testthat/test-vcr_example.R  
 ✓ .gitattributes: added  
 ◉ Learn more about `vcr`: https://books.ropensci.org/http-testing</code></pre>
@@ -1590,8 +1590,8 @@ situation. The <code>filter_sensitive_data</code> argument takes a named
 list where the <em>name</em> of the list is the string that will be used
 in the recorded cassettes <em>instead of</em> the secret, which is the
 list <em>item</em>. <code>vcr</code> will manage the replacement of that
-for you, so all you need to do is to edit your <code>setup-vcr.R</code>
-file like this:</p>
+for you, so all you need to do is to edit your <a href="https://testthat.r-lib.org/reference/test_dir.html#special-files"><code>helper-vcr.R</code>
+file</a> like this:</p>
 <pre class="r"><code>library(&quot;vcr&quot;) # *Required* as vcr is set up on loading
 invisible(vcr::vcr_configure(
   dir = &quot;../fixtures&quot;
@@ -1650,7 +1650,7 @@ are created, as no real requests will be made.</li>
 <li>you still need to fool your <em>package</em> into believing there is
 an API key as it will construct requests with it. So add the following
 lines to a testthat setup file
-(e.g. <code>tests/testthat/setup-vcr.R</code>)</li>
+(e.g. <code>tests/testthat/helper-vcr.R</code>)</li>
 </ul>
 <pre class="r"><code>if (!nzchar(Sys.getenv(&quot;APIKEY&quot;))) {
   Sys.setenv(&quot;APIKEY&quot; = &quot;foobar&quot;)
