@@ -1,3 +1,21 @@
+vcr 1.6.0
+=========
+
+### NEW FEATURES
+
+* `vcr` now supports `httr2` in addition to `httr` and `crul`. (#237) (#268)
+* `vcr` now supports async http requests with `crul` (w/ `crul` v1.5 or greater). no change was required in `vcr` for this to happen. a PR was merged in `crul` to hook into `vcr`. there's no support for async in `httr` as that package does not do any async and no support in `httr2` because `req_perform_parallel` does not have a mocking hook as does `req_perform` (#246)
+
+### BUG FIXES
+
+* Ports in URLs (e.g., 8000) were being accidentally stripped. Fixed now (#264) (#266)
+
+### MINOR IMPROVEMENTS
+
+* Add link to DESCRIPTION file for packge documentation. thanks @olivroy (#265)
+* Use `_PACKAGE` syntax for package level doc (#263)
+
+
 vcr 1.2.2
 =========
 
@@ -214,7 +232,7 @@ vcr 0.2.6
 ### MINOR IMPROVEMENTS
 
 * lots of tidying for better/consistent style
-* fix for a partial argument call in `as.list()`: `all` to `all.names` ([commit](https://github.com/ropensci/vcr/commit/b20a2d5ffd0f65175dee4d84aa9573f3652df1d2))
+* fix for a partial argument call in `as.list()`: `all` to `all.names`
 
 ### BUG FIXES
 

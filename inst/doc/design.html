@@ -282,11 +282,11 @@ internals of the HTTP clients.</p>
 <p>However, monkey patching is not allowed in R. Thus, in R we have to
 somehow have “hooks” into HTTP clients in R. Fortunately, Scott is the
 maintainer of one of the HTTP clients, <code>crul</code>, so was able to
-quickly create a hook. Very fortunately, there was already a hook
-mechanism in the <code>httr</code> package.</p>
+quickly create a hook. Fortunately, there was already a hook mechanism
+in the <code>httr</code> and <code>httr2</code> packages.</p>
 <p>The actual hooks are not in <code>vcr</code>, but in
 <code>webmockr</code>. <code>vcr</code> depends on <code>webmockr</code>
-for hooking into HTTP clients <code>httr</code> and
+for hooking into HTTP clients <code>httr</code>, <code>httr2</code> and
 <code>crul</code>.</p>
 </div>
 </div>
@@ -320,8 +320,9 @@ webmockr stubs.</p>
 <h4>How HTTP requests are handled</h4>
 <p>Within <code>webmockr</code>, there are calls to the vcr class
 <code>RequestHandler</code>, which has child classes
-<code>RequestHandlerCrul</code> and <code>RequestHandlerHttr</code> for
-<code>crul</code> and <code>httr</code>, respectively. These classes
+<code>RequestHandlerCrul</code>, <code>RequestHandlerHttr</code> and
+<code>RequestHandlerHttr2</code> for <code>crul</code>,
+<code>httr</code> and <code>httr2</code>, respectively. These classes
 determine what to do with each HTTP request. The options for each HTTP
 request include:</p>
 <ul>

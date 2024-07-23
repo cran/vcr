@@ -49,7 +49,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +60,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -374,12 +374,12 @@ need to re-record them then re-apply your edits.</li>
 <h2>Example 1: test using an edited cassette with a 503</h2>
 <p>First, write your test e.g.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>vcr<span class="sc">::</span><span class="fu">use_cassette</span>(<span class="st">&quot;api-error&quot;</span>, {</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">test_that</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    vcr<span class="sc">::</span><span class="fu">skip_if_vcr_off</span>()</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="fu">expect_error</span>(<span class="fu">call_my_api</span>()), <span class="st">&quot;error message&quot;</span><span class="er">)</span></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  })</span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>})</span></code></pre></div>
-<p>Then run your tests a first time.</p>
+<p>Then run your tests the first time.</p>
 <ol style="list-style-type: decimal">
 <li>It will fail</li>
 <li>It will have created a cassette under
@@ -435,7 +435,7 @@ only learn one thing, which is vcr. Now, by using the webmockr directly
 in your tests, you can also test for the behavior of your package in
 case of errors. Below we assume <code>api_url()</code> returns the URL
 <code>call_my_api()</code> calls.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">enable</span>()</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  stub <span class="ot">&lt;-</span> webmockr<span class="sc">::</span><span class="fu">stub_request</span>(<span class="st">&quot;get&quot;</span>, <span class="fu">api_url</span>())</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">to_return</span>(stub, <span class="at">status =</span> <span class="dv">503</span>)</span>
@@ -452,13 +452,13 @@ off. A con is that it’s quite different from the vcr syntax.</p>
 <p>Here we assume your package contains some sort of <a href="https://blog.r-hub.io/2020/04/07/retry-wheel/">retry</a>.</p>
 <p>First, write your test e.g.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>vcr<span class="sc">::</span><span class="fu">use_cassette</span>(<span class="st">&quot;api-error&quot;</span>, {</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">test_that</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    vcr<span class="sc">::</span><span class="fu">skip_if_vcr_off</span>()</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="fu">expect_message</span>(thing <span class="ot">&lt;-</span> <span class="fu">call_my_api</span>()), <span class="st">&quot;retry message&quot;</span><span class="er">)</span></span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="fu">expect_s4_class</span>(thing, <span class="st">&quot;data.frame&quot;</span>)</span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  })</span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>})</span></code></pre></div>
-<p>Then run your tests a first time.</p>
+<p>Then run your tests the first time.</p>
 <ol style="list-style-type: decimal">
 <li>It will fail</li>
 <li>It will have created a cassette under
@@ -541,7 +541,7 @@ only learn one thing, which is vcr. Now, by using the webmockr directly
 in your tests, you can also test for the behavior of your package in
 case of errors. Below we assume <code>api_url()</code> returns the URL
 <code>call_my_api()</code> calls.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">testhat</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;Errors are handled well&quot;</span>, {</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  webmockr<span class="sc">::</span><span class="fu">enable</span>()</span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  stub <span class="ot">&lt;-</span> webmockr<span class="sc">::</span><span class="fu">stub_request</span>(<span class="st">&quot;get&quot;</span>, <span class="fu">api_url</span>())</span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  stub <span class="sc">%&gt;%</span></span>

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2023-06-24" />
+<meta name="date" content="2024-07-23" />
 
 <title>Configure vcr</title>
 
@@ -1493,7 +1493,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Configure vcr</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2023-06-24</h4>
+<h4 class="date">2024-07-23</h4>
 
 </div>
 
@@ -1797,8 +1797,8 @@ use_cassette(&quot;foo_bar&quot;, {
 cassette created for the request/response to that url, while the
 google.com request will be ignored and not cached at all.</p>
 <p>Note: ignoring requests only works for the <code>crul</code> package
-for now; it should work for <code>httr</code> in a later
-<code>vcr</code> version.</p>
+for now; it should work for <code>httr</code> and <code>httr2</code> in
+a later <code>vcr</code> version.</p>
 </div>
 <div id="uri_parse" class="section level3">
 <h3>uri_parse</h3>
@@ -1869,8 +1869,9 @@ being written to the cassette.</p>
 the value with which to replace the real value.</p>
 <p>A request header you set to remove or replace is only
 removed/replaced from the cassette, and any requests using a cassette,
-but will still be in your crul or httr response objects on a real
-request that creates the cassette.</p>
+but will still be in your <code>crul</code>, <code>httr</code> or
+<code>httr2</code> response objects on a real request that creates the
+cassette.</p>
 <p>Examples:</p>
 <pre class="r"><code>vcr_configure(
   filter_request_headers = &quot;Authorization&quot;
@@ -1891,8 +1892,9 @@ being written to the cassette.</p>
 the value with which to replace the real value.</p>
 <p>A response header you set to remove or replace is only
 removed/replaced from the cassette, and any requests using a cassette,
-but will still be in your crul or httr response objects on a real
-request that creates the cassette.</p>
+but will still be in your <code>crul</code>, <code>httr</code> or
+<code>httr2</code> response objects on a real request that creates the
+cassette.</p>
 <p>Examples:</p>
 <pre class="r"><code>vcr_configure(
   filter_response_headers = &quot;server&quot;
@@ -1913,8 +1915,9 @@ parameter name and value) before being written to the cassette.</p>
 the value is the value with which to replace the real value.</p>
 <p>A response header you set to remove or replace is only
 removed/replaced from the cassette, and any requests using a cassette,
-but will still be in your crul or httr response objects on a real
-request that creates the cassette.</p>
+but will still be in your <code>crul</code>, <code>httr</code> or
+<code>httr2</code> response objects on a real request that creates the
+cassette.</p>
 <p>Beware of your <code>match_requests_on</code> option when using this
 filter. If you filter out a query parameter it’s probably a bad idea to
 match on <code>query</code> given that there is no way for vcr to

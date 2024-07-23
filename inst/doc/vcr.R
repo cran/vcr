@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ## -----------------------------------------------------------------------------
 #  library("vcr")
 
-## ---- echo=FALSE, message=FALSE-----------------------------------------------
+## ----echo=FALSE, message=FALSE------------------------------------------------
 library("vcr")
 
 ## ----echo=FALSE, results='hide', eval=identical(Sys.getenv("IN_PKGDOWN"), "true")----
@@ -24,7 +24,7 @@ library("vcr")
 #  unlink(file.path(cassette_path(), "helloworld.yml"))
 #  vcr_configure(dir = tempdir())
 
-## ---- eval=identical(Sys.getenv("IN_PKGDOWN"), "true")------------------------
+## ----eval=identical(Sys.getenv("IN_PKGDOWN"), "true")-------------------------
 #  library(vcr)
 #  library(crul)
 #  
@@ -35,7 +35,7 @@ library("vcr")
 #    })
 #  )
 
-## ---- eval=identical(Sys.getenv("IN_PKGDOWN"), "true")------------------------
+## ----eval=identical(Sys.getenv("IN_PKGDOWN"), "true")-------------------------
 #  system.time(
 #    use_cassette(name = "helloworld", {
 #      cli$get("get")
@@ -45,7 +45,7 @@ library("vcr")
 ## ----echo=FALSE, eval=identical(Sys.getenv("IN_PKGDOWN"), "true")-------------
 #  unlink(file.path(cassette_path(), "helloworld.yml"))
 
-## ---- echo = FALSE, results='asis', collapse=TRUE-----------------------------
+## ----echo = FALSE, results='asis', collapse=TRUE------------------------------
 defaults <- rev(vcr_config_defaults())
 defaults[unlist(lapply(defaults, is.character))] <- paste0('"', defaults[unlist(lapply(defaults, is.character))], '"')
 cat(sprintf("* %s = `%s`\n", names(defaults), defaults))

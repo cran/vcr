@@ -41,10 +41,11 @@ error with UnhandledHTTPRequestError
 }
 
 \examples{
+\dontrun{
 vcr_configure(dir = tempdir())
 cassettes()
 insert_cassette("turtle")
-request <- Request$new("post", 'https://eu.httpbin.org/post?a=5',
+request <- Request$new("post", 'https://hb.opencpu.org/post?a=5',
   "", list(foo = "bar"))
 
 err <- UnhandledHTTPRequestError$new(request)
@@ -70,6 +71,7 @@ err$match_requests_on_suggestion()
 # cleanup
 eject_cassette("turtle")
 unlink(tempdir())
+}
 \dontrun{
 # vcr_last_error()
 }

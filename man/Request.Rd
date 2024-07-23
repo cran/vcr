@@ -7,7 +7,7 @@
 object that handled all aspects of a request
 }
 \examples{
-url <- "https://eu.httpbin.org/post"
+url <- "https://hb.opencpu.org/post"
 body <- list(foo = "bar")
 headers <- list(
   `User-Agent` = "libcurl/7.54.0 r-curl/3.2 crul/0.5.2",
@@ -45,7 +45,7 @@ x$from_hash(h)
 
 \item{\code{headers}}{(character) named list}
 
-\item{\code{skip_port_stripping}}{(logical) whether to strip thhe port}
+\item{\code{skip_port_stripping}}{(logical) whether to strip the port}
 
 \item{\code{hash}}{(character) a named list - internal use}
 
@@ -56,6 +56,8 @@ x$from_hash(h)
 \item{\code{fields}}{(various) request body details}
 
 \item{\code{output}}{(various) request output details, disk, memory, etc}
+
+\item{\code{policies}}{(various) http policies, used in httr2 only}
 }
 \if{html}{\out{</div>}}
 }
@@ -74,7 +76,18 @@ x$from_hash(h)
 \subsection{Method \code{new()}}{
 Create a new \code{Request} object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Request$new(method, uri, body, headers, opts, disk, fields, output)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Request$new(
+  method,
+  uri,
+  body,
+  headers,
+  opts,
+  disk,
+  fields,
+  output,
+  policies,
+  skip_port_stripping = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -96,6 +109,11 @@ post, put, patch or delete)}
 \item{\code{fields}}{(various) post fields}
 
 \item{\code{output}}{(various) output details}
+
+\item{\code{policies}}{(various) http policies, used in httr2 only}
+
+\item{\code{skip_port_stripping}}{(logical) whether to strip the port.
+default: \code{FALSE}}
 }
 \if{html}{\out{</div>}}
 }
