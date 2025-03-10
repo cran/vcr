@@ -11,7 +11,7 @@
 
 <meta name="author" content="Scott Chamberlain" />
 
-<meta name="date" content="2024-07-23" />
+<meta name="date" content="2025-03-07" />
 
 <title>Mocking writing to disk</title>
 
@@ -1493,7 +1493,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Mocking writing to disk</h1>
 <h4 class="author">Scott Chamberlain</h4>
-<h4 class="date">2024-07-23</h4>
+<h4 class="date">2025-03-07</h4>
 
 </div>
 
@@ -1513,7 +1513,7 @@ vcr_configure(
   write_disk_path = file.path(tmpdir, &quot;files&quot;)
 )
 #&gt; &lt;vcr configuration&gt;
-#&gt;   Cassette Dir: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//Rtmp0x017D/fixtures
+#&gt;   Cassette Dir: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//RtmpYP4GHK/fixtures
 #&gt;   Record: new_episodes
 #&gt;   Serialize with: yaml
 #&gt;   URI Parser: urltools::url_parse
@@ -1522,7 +1522,7 @@ vcr_configure(
 #&gt;   Logging?: FALSE
 #&gt;   ignored hosts: google.com
 #&gt;   ignore localhost?: TRUE
-#&gt;   Write disk path: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//Rtmp0x017D/files</code></pre>
+#&gt;   Write disk path: /var/folders/vw/4nm3x1ld0_jgmqy6_yf6pz3c0000gn/T//RtmpYP4GHK/files</code></pre>
 <p>Then pass a file path (that doesn’t exist yet) to crul’s
 <code>disk</code> parameter. <code>vcr</code> will take care of handling
 writing the response to that file in addition to the cassette.</p>
@@ -1536,7 +1536,7 @@ cas &lt;- use_cassette(&quot;test_write_to_disk&quot;, {
 file.exists(out$content)
 #&gt; [1] TRUE
 out$parse()
-#&gt; [1] &quot;{\n  \&quot;args\&quot;: {}, \n  \&quot;headers\&quot;: {\n    \&quot;Accept\&quot;: \&quot;application/json, text/xml, application/xml, */*\&quot;, \n    \&quot;Accept-Encoding\&quot;: \&quot;gzip, deflate\&quot;, \n    \&quot;Host\&quot;: \&quot;httpbin.org\&quot;, \n    \&quot;User-Agent\&quot;: \&quot;libcurl/8.6.0 r-curl/5.2.1 crul/1.5.0\&quot;, \n    \&quot;X-Amzn-Trace-Id\&quot;: \&quot;Root=1-66a016c3-394fcd1f3d09758a2d41d1cf\&quot;\n  }, \n  \&quot;origin\&quot;: \&quot;97.115.218.102\&quot;, \n  \&quot;url\&quot;: \&quot;https://httpbin.org/get\&quot;\n}\n&quot;</code></pre>
+#&gt; [1] &quot;&lt;html&gt;\r\n&lt;head&gt;&lt;title&gt;502 Bad Gateway&lt;/title&gt;&lt;/head&gt;\r\n&lt;body&gt;\r\n&lt;center&gt;&lt;h1&gt;502 Bad Gateway&lt;/h1&gt;&lt;/center&gt;\r\n&lt;/body&gt;\r\n&lt;/html&gt;\r\n&quot;</code></pre>
 <p>This also works with <code>httr</code>. The only difference is that
 you write to disk with a function <code>httr::write_disk(path)</code>
 rather than a parameter.</p>

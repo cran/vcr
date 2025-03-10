@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 )
 
 ## -----------------------------------------------------------------------------
-#  library("vcr")
+# library("vcr")
 
 ## -----------------------------------------------------------------------------
 library("vcr")
@@ -55,11 +55,11 @@ vcr_configure(ignore_hosts = "google.com")
 vcr_configure(ignore_localhost = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  vcr_configure(ignore_hosts = "google.com")
-#  use_cassette("foo_bar", {
-#    crul::HttpClient$new("https://httpbin.org/get")$get()
-#    crul::HttpClient$new("https://google.com")$get()
-#  })
+# vcr_configure(ignore_hosts = "google.com")
+# use_cassette("foo_bar", {
+#   crul::HttpClient$new("https://httpbin.org/get")$get()
+#   crul::HttpClient$new("https://google.com")$get()
+# })
 
 ## -----------------------------------------------------------------------------
 vcr_configure(uri_parser = "urltools::url_parse")
