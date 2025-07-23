@@ -1,58 +1,55 @@
-tmpdir <- tempdir()
-vcr_configure(dir = tmpdir, warn_on_empty_cassette = FALSE)
+test_that("can insert and eject a cassette", {
+  expect_false(cassette_active())
+  expect_equal(current_cassette(), NULL)
 
-context("cassettes")
-test_that("cassettes works", {
-  aa <- cassettes()
-  expect_is(aa, "list")
-  expect_equal(length(aa), 0)
+  cassette <- insert_cassette("test", warn_on_empty = FALSE)
+  expect_s3_class(cassette, "Cassette")
+  expect_true(cassette_active())
+  expect_equal(current_cassette(), cassette)
 
-  cc <- suppressMessages(insert_cassette("foobar24"))
+  expect_equal(eject_cassette(), cassette)
 
-  bb <- cassettes()
-  # cassette in named list
-  expect_named(bb, "foobar24")
-  # even after cassette inserted, list is empty
-  expect_equal(length(bb$foobar24), 0)
-
-  # eject
-  cc$eject()
+  expect_false(cassette_active())
+  expect_equal(current_cassette(), NULL)
 })
 
-unlink(file.path(vcr_configuration()$dir, "foobar24.yml"))
-
-# FIXME: add tests for on_disk and verb params
-
-context("current_cassette")
-test_that("current_cassette works", {
-  # no cassettes in use
-  aa <- current_cassette()
-  expect_is(aa, "list")
-  expect_equal(length(aa), 0)
-
-  # cassette in use
-  cas <- insert_cassette("rrrrrrrrrrr")
-  aa <- current_cassette()
-  expect_is(aa, "Cassette")
-  expect_gt(length(aa), 1)
-  expect_equal(aa$name, 'rrrrrrrrrrr')
-  cas$eject()
+test_that("ejecting errors if no cassettes", {
+  expect_snapshot(eject_cassette(), error = TRUE)
 })
 
-unlink(file.path(vcr_configuration()$dir, "rrrrrrrrrrr.yml"))
+test_that("cassettes are a stack", {
+  expect_equal(current_cassette(), NULL)
+  expect_equal(cassettes(), list())
+  expect_equal(cassette_names(), character(0))
 
-context("cassette_path")
+  cassette_a <- insert_cassette("aaa", warn_on_empty = FALSE)
+  expect_equal(current_cassette(), cassette_a)
+  expect_equal(cassettes(), list(cassette_a))
+  expect_equal(cassette_names(), "aaa")
+
+  cassette_b <- insert_cassette("bbb", warn_on_empty = FALSE)
+  expect_equal(current_cassette(), cassette_b)
+  expect_equal(cassettes(), list(cassette_a, cassette_b))
+  expect_equal(cassette_names(), c("aaa", "bbb"))
+
+  eject_cassette()
+  expect_equal(current_cassette(), cassette_a)
+  expect_equal(cassettes(), list(cassette_a))
+  expect_equal(cassette_names(), "aaa")
+
+  eject_cassette()
+  expect_equal(current_cassette(), NULL)
+  expect_equal(cassettes(), list())
+})
+
 test_that("cassette_path works", {
+  local_vcr_configure(dir = withr::local_tempdir())
   # before vcr_config set, there's a temp dir
   aa <- cassette_path()
-  expect_is(aa, "character")
+  expect_type(aa, "character")
 
   # after vcr_config set, dir should be different
-  vcr_configure(dir = "foo")
+  local_vcr_configure(dir = "foo")
   aa <- cassette_path()
-  expect_is(aa, "character")
   expect_equal(aa, "foo")
 })
-
-# reset
-vcr_configure_reset()

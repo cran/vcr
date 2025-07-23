@@ -15,14 +15,13 @@ test_that(\"foo works\", {
   })
   expect_true(x)
 })\n",
-  learn_more =
-  "Learn more about `vcr`: https://books.ropensci.org/http-testing",
+  learn_more = "Learn more about `vcr`: https://books.ropensci.org/http-testing",
   gitattributes = "* text=auto
 tests/fixtures/**/* -diff\n"
 )
 
 vcr_cat_line <- function(txt) {
-  bullet <- crayon::green(cli::symbol$tick)
+  bullet <- cli::col_green(cli::symbol$tick)
   cli::cat_line(paste(bullet, txt, " "))
 }
 
@@ -36,73 +35,108 @@ pkg_name <- function(dir) {
   if (!file.exists(desc_path)) {
     stop("'DESCRIPTION' not found; are you sure it's an R package?")
   }
-  data.frame(read.dcf(desc_path),
-    stringsAsFactors = FALSE)[["Package"]]
+  data.frame(read.dcf(desc_path), stringsAsFactors = FALSE)[["Package"]]
 }
 
 suggest_vcr <- function(dir, verbose = TRUE, version = "*") {
-  if (verbose) vcr_cat_line(sprintf("Adding %s to %s field in DESCRIPTION",
-    crayon::blue("vcr"),
-    crayon::red("Suggests")))
+  if (verbose) {
+    vcr_cat_line(sprintf(
+      "Adding %s to %s field in DESCRIPTION",
+      cli::col_blue("vcr"),
+      cli::col_red("Suggests")
+    ))
+  }
   desc::desc_set_dep("vcr", "Suggests", file = dir, version = version)
   invisible()
 }
 
 test_r_file_exists <- function(dir) {
   ff <- setdiff(
-    list.files(file.path(dir, "tests"), full.names=TRUE, pattern = ".R|.r"),
-    list.dirs(file.path(dir, "tests"), recursive=FALSE))
-  if (length(ff) == 0) return(FALSE)
+    list.files(file.path(dir, "tests"), full.names = TRUE, pattern = ".R|.r"),
+    list.dirs(file.path(dir, "tests"), recursive = FALSE)
+  )
+  if (length(ff) == 0) {
+    return(FALSE)
+  }
   any(
-    vapply(ff, function(z) {
-      any(grepl("test_check", readLines(z)))
-    }, logical(1))
+    vapply(
+      ff,
+      function(z) {
+        any(grepl("test_check", readLines(z)))
+      },
+      logical(1)
+    )
   )
 }
 
 #' Setup vcr for a package
 #'
+#' `r lifecycle::badge('deprecated')`
+#' `use_vcr()` is deprecated because it is no longer needed. In lifecycle v2,
+#' [local_cassette()] and friends automatically use `tests/testthat/_vcr`
+#' without any need for additional configuration.
+#'
 #' @export
 #' @param dir (character) path to package root. default's to
 #' current directory
+#' @keywords internal
 #' @param verbose (logical) print progress messages. default: `TRUE`
 #' @return only messages about progress, returns invisible()
-#' @details Sets a mimimum vcr version, which is usually the latest
+#' @details Sets a minimum vcr version, which is usually the latest
 #' (stable) version on CRAN. You can of course easily remove or change
 #' the version requirement yourself after running this function.
 use_vcr <- function(dir = ".", verbose = TRUE) {
-  assert(dir, "character")
-  stopifnot(length(dir) == 1)
-  if (!dir.exists(dir)) stop("'dir' does not exist")
-  invisible(lapply(c("desc", "cli", "crayon"), check_for_a_pkg))
+  lifecycle::deprecate_warn("2.0.0", "vcr::use_vcr()")
+
+  check_string(dir)
+  if (!dir.exists(dir)) {
+    stop("'dir' does not exist")
+  }
+  check_installed(c("desc", "cli"))
 
   pkg <- pkg_name(dir)
-  if (verbose) vcr_cat_info(paste0("Using package: ", crayon::blue(pkg)))
+  if (verbose) {
+    vcr_cat_info(paste0("Using package: ", cli::col_blue(pkg)))
+  }
 
   # note: assuming fixtures directory
-  if (verbose) vcr_cat_info(paste0("assuming fixtures at: ",
-    crayon::blue("tests/fixtures")))
+  if (verbose) {
+    vcr_cat_info(paste0(
+      "assuming fixtures at: ",
+      cli::col_blue("tests/fixtures")
+    ))
+  }
 
   # add vcr to Suggests in DESCRIPTION file
   suggest_vcr(dir, verbose, ">= 0.6.0")
 
   # add tests/testthat.R if not present
   if (!dir.exists(file.path(dir, "tests/testthat"))) {
-    if (verbose) vcr_cat_line(paste0("Creating directory: ",
-      file.path(dir, "tests/testthat")))
-    dir.create(file.path(dir, "tests/testthat"), recursive = TRUE)
+    if (verbose) {
+      vcr_cat_line(paste0(
+        "Creating directory: ",
+        file.path(dir, "tests/testthat")
+      ))
+    }
+    dir_create(file.path(dir, "tests/testthat"))
   }
-  if (verbose) vcr_cat_info("Looking for testthat.R file or similar")
+  if (verbose) {
+    vcr_cat_info("Looking for testthat.R file or similar")
+  }
   tall <- file.path(dir, "tests/testthat.R")
   if (!test_r_file_exists(dir)) {
-    if (verbose)
-      vcr_cat_line(paste0(crayon::blue("tests/testthat.R:" ), " added"))
+    if (verbose) {
+      vcr_cat_line(paste0(cli::col_blue("tests/testthat.R:"), " added"))
+    }
     file.create(tall, showWarnings = FALSE)
     cat(sprintf(vcr_text$test_all, pkg), file = tall, append = TRUE)
   } else {
-    if (verbose)
-      vcr_cat_info(paste0(crayon::blue("tests/testthat.R (or similar):" ),
-        " exists"))
+    if (verbose) {
+      vcr_cat_info(paste0(
+        cli::col_blue("tests/testthat.R (or similar):"),
+        " exists"
+      ))
+    }
   }
 
   # add helper-pkgname.R to tests/testthat/
@@ -112,47 +146,67 @@ use_vcr <- function(dir = ".", verbose = TRUE) {
     file.create(abs_hf, showWarnings = FALSE)
   }
   if (!any(grepl("vcr_configure", readLines(abs_hf)))) {
-    if (verbose) vcr_cat_line(paste0("Adding vcr config to ",
-      crayon::blue(rel_hf)))
+    if (verbose) {
+      vcr_cat_line(paste0("Adding vcr config to ", cli::col_blue(rel_hf)))
+    }
     cat(vcr_text$config, file = abs_hf, append = TRUE)
   } else {
-    if (verbose) vcr_cat_info(paste0("vcr config appears to be already setup in ",
-      crayon::blue(rel_hf)))
+    if (verbose) {
+      vcr_cat_info(paste0(
+        "vcr config appears to be already setup in ",
+        cli::col_blue(rel_hf)
+      ))
+    }
   }
 
   # add dummy test file with example of use_cassette()
-  if (verbose) vcr_cat_line(paste0("Adding example test file ",
-    crayon::blue("tests/testthat/test-vcr_example.R")))
+  if (verbose) {
+    vcr_cat_line(paste0(
+      "Adding example test file ",
+      cli::col_blue("tests/testthat/test-vcr_example.R")
+    ))
+  }
   dummyfile <- file.path(dir, "tests/testthat/test-vcr_example.R")
   cat(vcr_text$example_test, file = dummyfile)
 
   # add .gitattributes file
   gitattsfile <- file.path(dir, ".gitattributes")
   if (!file.exists(gitattsfile)) {
-    if (verbose)
-      vcr_cat_line(paste0(crayon::blue(".gitattributes:" ), " added"))
+    if (verbose) {
+      vcr_cat_line(paste0(cli::col_blue(".gitattributes:"), " added"))
+    }
     cat(vcr_text$gitattributes, file = gitattsfile)
   } else {
-    if (verbose)
-      vcr_cat_info(paste0(crayon::blue(".gitattributes:" ), " exists"))
+    if (verbose) {
+      vcr_cat_info(paste0(cli::col_blue(".gitattributes:"), " exists"))
+    }
     txt <- readLines(gitattsfile)
     if (
       any(grepl("tests\\/fixtures\\/\\*\\*\\/\\* -diff", txt)) &&
-      any(grepl("* text=auto", txt))
+        any(grepl("* text=auto", txt))
     ) {
-      if (verbose)
+      if (verbose) {
         vcr_cat_info(
-          paste0(crayon::blue(".gitattributes"),
-            " already setup to ignore cassette diffs"))
+          paste0(
+            cli::col_blue(".gitattributes"),
+            " already setup to ignore cassette diffs"
+          )
+        )
+      }
     } else {
-      if (verbose)
-        vcr_cat_info(sprintf("appending lines to %s to ignore cassette diffs",
-          crayon::blue(".gitattributes")))
+      if (verbose) {
+        vcr_cat_info(sprintf(
+          "appending lines to %s to ignore cassette diffs",
+          cli::col_blue(".gitattributes")
+        ))
+      }
       cat(vcr_text$gitattributes, file = gitattsfile, append = TRUE)
     }
   }
 
   # done
-  if (verbose) vcr_cat_info(vcr_text$learn_more)
+  if (verbose) {
+    vcr_cat_info(vcr_text$learn_more)
+  }
   invisible()
 }

@@ -3,33 +3,35 @@
 \name{cassettes}
 \alias{cassettes}
 \alias{current_cassette}
+\alias{current_cassette_recording}
+\alias{current_cassette_replaying}
 \alias{cassette_path}
 \title{List cassettes, get current cassette, etc.}
 \usage{
-cassettes(on_disk = TRUE, verb = FALSE)
+cassettes()
 
 current_cassette()
 
-cassette_path()
-}
-\arguments{
-\item{on_disk}{(logical) Check for cassettes on disk + cassettes in session
-(\code{TRUE}), or check for only cassettes in session (\code{FALSE}). Default: \code{TRUE}}
+current_cassette_recording()
 
-\item{verb}{(logical) verbose messages}
+current_cassette_replaying()
+
+cassette_path()
 }
 \description{
 List cassettes, get current cassette, etc.
 }
 \details{
 \itemize{
-\item \code{cassettes()}: returns cassettes found in your R session, you can toggle
-whether we pull from those on disk or not
-\item \code{current_cassette()}: returns an empty list when no cassettes are in use,
-while it returns the current cassette (a \code{Cassette} object) when one is
-in use
-\item \code{cassette_path()}: just gives you the current directory path where
-cassettes will be stored
+\item \code{cassettes()}: returns all active cassettes in the current
+session.
+\item \code{current_cassette()}: returns \code{NULL} when no cassettes are in use;
+returns the current cassette (a \code{Cassette} object) when one is in use
+\item \code{currrent_cassette_recording()} and \code{current_cassette_replaying()}:
+tell you if the current cassette is recording and/or replaying. They
+both return \code{FALSE} if there is no cassette in use.
+\item \code{cassette_path()}: returns the current directory path where cassettes
+will be stored
 }
 }
 \examples{
@@ -37,15 +39,15 @@ vcr_configure(dir = tempdir())
 
 # list all cassettes
 cassettes()
-cassettes(on_disk = FALSE)
 
 # list the currently active cassette
 insert_cassette("stuffthings")
 current_cassette()
-eject_cassette()
-
 cassettes()
-cassettes(on_disk = FALSE)
+
+eject_cassette()
+cassettes()
+
 
 # list the path to cassettes
 cassette_path()

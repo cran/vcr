@@ -241,34 +241,61 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <p>This section explains <code>vcr</code>’s internal design and
 architecture.</p>
-<div id="where-vcr-comes-from-and-why-r6" class="section level3">
-<h3>Where vcr comes from and why R6</h3>
+<div id="how-vcr-works" class="section level3">
+<h3>How vcr works</h3>
+<p>The steps:</p>
+<ol style="list-style-type: decimal">
+<li>Use either <code>vcr::use_cassette()</code> or
+<code>vcr::local_cassette()</code></li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>If you use <code>vcr::local_cassette()</code>, make sure to run
+<code>vcr::eject_cassette()</code> when you’re done to stop
+recording</li>
+</ol>
+<ol start="2" style="list-style-type: decimal">
+<li>When you first run a request with <code>vcr</code> there’s no cached
+data to use, so we allow HTTP requests until your request is done.</li>
+<li>The real HTTP request is made and we record a response in memory
+(not written to disk).</li>
+<li>We then disallow HTTP requests so that if the request is done again
+we use the cached response.</li>
+<li>The last thing we do is write the HTTP interaction to disk in a
+mostly human readable form.</li>
+</ol>
+<p>When you run that request again using
+<code>vcr::use_cassette()</code> or
+<code>vcr::local_cassette()</code>:</p>
+<ul>
+<li>We attempt to match the request to cached requests, and since we
+stubbed the request the first time we used the cached response.</li>
+</ul>
+<p>Of course if you do a different request, even slightly (but depending
+on which matching format you decided to use), then the request will have
+no matching stub and no cached response, and then a real HTTP request is
+done - we then cache it, then subsequent requests will pull from that
+cached response.</p>
+<p>You can use any of the three HTTP R clients: <code>crul</code>,
+<code>httr</code> and <code>httr2</code>.</p>
+<p>The main use case we are going for in <code>vcr</code> is to deal
+with real HTTP requests and responses, so we allow real HTTP requests
+when we need to, and turn it off when we don’t.</p>
+</div>
+<div id="where-vcr-comes-from" class="section level3">
+<h3>Where vcr comes from</h3>
 <p><code>vcr</code> was “ported” from the Ruby gem (aka, library) of the
 same name<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. Because it was ported from Ruby, an
 object-oriented programming language I thought it would be easier to use
 an object system in R that most closely resemble that used in Ruby (at
-least in my opinion). This thinking lead to choosing <a href="https://adv-r.hadley.nz/r6.html">R6</a>. The exported functions
-users interact with are not R6 classes, but are rather normal R
-functions. However, most of the internal code in the package uses R6.
-Thus, familiarity with R6 is important for people that may want to
-contribute to <code>vcr</code>, but not required at all for
-<code>vcr</code> users.</p>
+least in my opinion). This thinking lead to choosing <a href="https://adv-r.hadley.nz/r6.html">R6</a>. Since v2 we’ve mostly
+removed use of R6 throughout the package.</p>
 </div>
 <div id="principles" class="section level3">
 <h3>Principles</h3>
 <div id="an-easy-to-use-interface-hides-complexity" class="section level4">
 <h4>An easy to use interface hides complexity</h4>
-<p>As described above, <code>vcr</code> uses R6 internally, but users
-interact with normal R functions. Internal functions that are quite
-complicated are largely R6 while exported, simpler functions users
-interact with are normal R functions.</p>
-</div>
-<div id="classfunction-names-are-inherited-from-ruby-vcr" class="section level4">
-<h4>Class/function names are inherited from Ruby vcr</h4>
-<p>Since R <code>vcr</code> was ported from Ruby, we kept most of the
-names of functions/classes and variables. So if you’re wondering about
-why a function, class, or variable has a particular name, its derivation
-can not be found out in this package, for the most part that is.</p>
+<p>As described above, <code>vcr</code> uses some R6 internally, but
+users interact with normal R functions.</p>
 </div>
 <div id="hooks-into-http-clients" class="section level4">
 <h4>Hooks into HTTP clients</h4>
@@ -284,10 +311,6 @@ somehow have “hooks” into HTTP clients in R. Fortunately, Scott is the
 maintainer of one of the HTTP clients, <code>crul</code>, so was able to
 quickly create a hook. Fortunately, there was already a hook mechanism
 in the <code>httr</code> and <code>httr2</code> packages.</p>
-<p>The actual hooks are not in <code>vcr</code>, but in
-<code>webmockr</code>. <code>vcr</code> depends on <code>webmockr</code>
-for hooking into HTTP clients <code>httr</code>, <code>httr2</code> and
-<code>crul</code>.</p>
 </div>
 </div>
 <div id="internal-classes" class="section level3">
@@ -295,36 +318,32 @@ for hooking into HTTP clients <code>httr</code>, <code>httr2</code> and
 <p>An overview of some of the more important aspects of vcr.</p>
 <div id="configuration" class="section level4">
 <h4>Configuration</h4>
-<p>An internal object (<code>vcr_c</code>) is created when
-<code>vcr</code> is loaded with the default vcr configuration options
-inside of an R6 class <code>VCRConfig</code> - see <a href="https://github.com/ropensci/vcr/blob/main/R/onLoad.R" class="uri">https://github.com/ropensci/vcr/blob/main/R/onLoad.R</a>.
-This class is keeps track of default and user specified configuration
-options. You can access <code>vcr_c</code> using triple namespace
-<code>:::</code>, though it is not intended for general use. Whenever
-you make calls to <code>vcr_configure()</code> or other configuration
-functions, <code>vcr_c</code> is affected.</p>
+<p>An internal object (<code>the</code>) is created when
+<code>vcr</code> is loaded with the default vcr configuration options in
+a list. This class keeps track of default and user specified
+configuration options. You can access <code>the</code> using triple
+namespace <code>:::</code>, though it is not intended for general use.
+Whenever you make calls to <code>vcr_configure()</code> or other
+configuration functions, <code>the</code> is affected.</p>
 </div>
 <div id="cassette-class" class="section level4">
 <h4>Cassette class</h4>
 <p><code>Cassette</code> is an R6 class that handles internals/state for
-each cassette. Each time you run <code>use_cassette()</code> this class
-is used. The class has quite a few methods in it, so there’s a lot going
-on in the class. Ideally the class would be separated into subclasses to
+each cassette. Each time you run
+<code>use_cassette()</code>/<code>local_cassette()</code> this class is
+used. The class has quite a few methods in it, so there’s a lot going on
+in the class. Ideally the class would be separated into subclasses to
 handle similar sets of logic, but there’s not an easy way to do that
 with R6.</p>
-<p>Of note in <code>Cassette</code> is that when called, within the
-<code>initialize()</code> call <code>webmockr</code> is used to create
-webmockr stubs.</p>
 </div>
 <div id="how-http-requests-are-handled" class="section level4">
 <h4>How HTTP requests are handled</h4>
-<p>Within <code>webmockr</code>, there are calls to the vcr class
-<code>RequestHandler</code>, which has child classes
+<p><code>RequestHandler</code> and it’s child classes
 <code>RequestHandlerCrul</code>, <code>RequestHandlerHttr</code> and
-<code>RequestHandlerHttr2</code> for <code>crul</code>,
-<code>httr</code> and <code>httr2</code>, respectively. These classes
-determine what to do with each HTTP request. The options for each HTTP
-request include:</p>
+<code>RequestHandlerHttr2</code>, handle the logic for for
+<code>crul</code>, <code>httr</code> and <code>httr2</code>,
+respectively. These classes determine what to do with each HTTP request.
+The options for each HTTP request include:</p>
 <ul>
 <li><strong>Ignored</strong> You can ignore HTTP requests under certain
 rules using the configuration options <code>ignore_hosts</code> and
@@ -339,48 +358,24 @@ match is found in the cassette defined in the
 <code>use_cassette()</code>/<code>insert_cassette()</code> call. In this
 case a real HTTP request is allowed, and the request/response is
 recorded to the cassette.</li>
-<li><strong>Unhandled</strong> This is a group of cases, all of which
-cause an error to be thrown with a message trying to help the user
-figure out how to fix the problem.</li>
+<li><strong>Unhandled</strong> If none of the above are triggered,
+you’ll get a hopefully helpful error message.</li>
 </ul>
-<p>If you use <a href="https://docs.ropensci.org/vcr/articles/debugging.html?q=logging#logging-1">vcr
-logging</a> you’ll see these categories in your logs.</p>
 </div>
 <div id="serializers" class="section level4">
 <h4>Serializers</h4>
 <p>Serializers handle in what format cassettes are written to files on
-disk. The current options are YAML (default) and JSON. YAML was
+disk. The current options are YAML (default), JSON, and QS2. YAML was
 implemented first in <code>vcr</code> because that’s the default option
 in Ruby vcr.</p>
 <p>An R6 class <code>Serializer</code> is the parent class for all
-serializer types; <code>YAML</code> and <code>JSON</code> are both R6
-classes that inherit from <code>Serializer</code>. Both
-<code>YAML</code> and <code>JSON</code> define just two methods:
-<code>serialize()</code> and <code>deserialize()</code> for converting R
-structures to yaml or json, and converting yaml or json back to R
-structures, respectively.</p>
-</div>
-</div>
-<div id="environments" class="section level3">
-<h3>Environments</h3>
-<div id="logging" class="section level4">
-<h4>Logging</h4>
-<p>An internal environment (<code>vcr_log_env</code>) is used when you
-use logging. At this point it only keeps track of one variable -
-<code>file</code> - to be able to refer to what file is used for logging
-across many classes/functions that need to write to the log file.</p>
-</div>
-<div id="a-bit-of-housekeeping" class="section level4">
-<h4>A bit of housekeeping</h4>
-<p>Another internal environment (<code>vcr__env</code>) is used to keep
-track of a few items, including the current cassette in use, and the
-last vcr error.</p>
-</div>
-<div id="lightswitch" class="section level4">
-<h4>Lightswitch</h4>
-<p>Another internal environment (<code>light_switch</code>) is used to
-keep track of users turning on and off <code>vcr</code>. See
-<code>?lightswitch</code>.</p>
+serializer types; <code>YAML</code>, <code>JSON</code>, and
+<code>QS2</code> are all R6 classes that inherit from
+<code>Serializer</code>. All <code>YAML</code>, <code>JSON</code>, and
+<code>QS2</code> define just two methods: <code>serialize()</code> and
+<code>deserialize()</code> for converting R structures to yaml, json, or
+qs2, and converting yaml, json, or qs2 back to R structures,
+respectively.</p>
 </div>
 </div>
 <div class="footnotes footnotes-end-of-document">

@@ -1,38 +1,29 @@
-context("Configuration")
-
-teardown({
-  vcr_configure_reset()
-  vcr_configure(dir = tmpdir, write_disk_path = file.path(tmpdir, "files"))
+test_that("config checks inputs", {
+  expect_snapshot(error = TRUE, {
+    vcr_configure(foo = "bar")
+    vcr_configure(record = "asdfadfs")
+    vcr_configure(match_requests_on = "x")
+  })
 })
 
-test_that("VCRConfig", {
-  expect_is(VCRConfig, "R6ClassGenerator")
-  cl <- vcr_configuration()
-  expect_is(cl,  "R6")
-  expect_is(cl,  "VCRConfig")
+test_that("returns previous values", {
+  local_vcr_configure(dir = NULL, record = "none")
+
+  old <- vcr_configure(dir = "dir1", record = "once")
+  expect_equal(old, list(dir = NULL, record = "none"))
 })
 
-test_that("config fails well with invalid record mode", {
-  expect_error(
-    vcr_configure(record = "asdfadfs"),
-    "'record' value of 'asdfadfs' is not in the allowed set"
-  )
-})
-
-test_that("config fails well with invalid request matchers", {
-  expect_error(
-    vcr_configure(match_requests_on = "x"),
-    "1 or more 'match_requests_on' values \\(x\\) is not in the allowed set"
-  )
+test_that("if called with no args returns a list of all args", {
+  out <- vcr_configure()
+  expect_equal(out, the$config)
 })
 
 test_that("vcr_configure() only affects settings passed as arguments", {
-  vcr_configure_reset()
-  vcr_configure(dir = "olddir", record = "none")
-  config1 <- vcr_c$clone()
+  local_vcr_configure(dir = "olddir", record = "none")
 
+  config1 <- the$config
   vcr_configure(dir = "newdir")
-  config2 <- vcr_c$clone()
+  config2 <- the$config
 
   expect_equal(config1$dir, "olddir")
   expect_equal(config2$dir, "newdir")
@@ -41,19 +32,21 @@ test_that("vcr_configure() only affects settings passed as arguments", {
   expect_equal(config2$record, "none")
 })
 
-test_that("warnings are thrown for invalid parameters", {
-  expect_warning(
-    vcr_configure(foo = "bar"),
-    "The following configuration parameters are not valid"
-  )
+
+test_that("can temporarily change configuration", {
+  local_vcr_configure(dir = "a")
+
+  local({
+    local_vcr_configure(dir = "b")
+    expect_equal(cassette_path(), "b")
+  })
+
+  expect_equal(cassette_path(), "a")
 })
 
-test_that("all configuration params are documented", {
-  rd_file <- "../../man/vcr_configure.Rd"
-  skip_if_not(file.exists(rd_file), sprintf("Did not find: '%s'", rd_file))
+test_that("filter_sensitive data strips quotes with message", {
+  local_vcr_configure()
 
-  rd_args <- extract_vcr_config_args(rd_file)
-  fn_args <- names(VCRConfig$new()$as_list())
-
-  expect_setequal(rd_args, fn_args)
+  expect_snapshot(vcr_configure(filter_sensitive_data = list("key" = '"val"')))
+  expect_equal(vcr_configuration()$filter_sensitive_data, list("key" = "val"))
 })

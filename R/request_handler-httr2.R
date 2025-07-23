@@ -1,115 +1,141 @@
-#' @title RequestHandlerHttr2
-#' @description Methods for the httr2 package, building on [RequestHandler]
-#' @export
-#' @param request The request from an object of class `HttpInteraction`
-#' @examples \dontrun{
-#' # GET request
-#' library(httr2)
-#' req <- request("https://hb.opencpu.org/post") %>%
-#'    req_body_json(list(foo = "bar"))
-#' x <- RequestHandlerHttr2$new(req)
-#' # x$handle()
-#'
-#' # POST request
-#' library(httr2)
-#' mydir <- file.path(tempdir(), "testing_httr2")
-#' invisible(vcr_configure(dir = mydir))
-#' req <- request("https://hb.opencpu.org/post") %>%
-#'   req_body_json(list(foo = "bar"))
-#' use_cassette(name = "testing3", {
-#'   response <- req_perform(req)
-#' }, match_requests_on = c("method", "uri", "body"))
-#' use_cassette(name = "testing3", {
-#'   response2 <- req_perform(req)
-#' }, match_requests_on = c("method", "uri", "body"))
-#' }
 RequestHandlerHttr2 <- R6::R6Class(
   "RequestHandlerHttr2",
   inherit = RequestHandler,
 
   public = list(
-    #' @description Create a new `RequestHandlerHttr2` object
-    #' @param request The request from an object of class `HttpInteraction`
-    #' @return A new `RequestHandlerHttr2` object
     initialize = function(request) {
       if (!length(request$method)) {
-        request$method <- webmockr:::req_method_get_w(request)
+        request$method <- httr2_method(request)
       }
       self$request_original <- request
-      self$request <- {
-        Request$new(request$method, request$url,
-          webmockr::pluck_body(request), request$headers,
-          fields = request$fields, opts = request$options,
-          policies = request$policies)
-      }
-      self$cassette <- tryCatch(current_cassette(), error = function(e) e)
-    }
-  ),
+      self$request <- vcr_request(
+        request$method,
+        request$url,
+        httr2_body(request),
+        httr2_headers(request)
+      )
+    },
+    on_ignored_request = function() {
+      httr2::local_mocked_responses(NULL)
+      httr2::req_perform(self$request_original)
+    },
 
-  private = list(
-    # make a `vcr` response
-    response_for = function(x) {
-      VcrResponse$new(
-        list(status_code = x$status_code, description = httr2::resp_status_desc(x)),
-        x$headers,
-        x$body,
-        "",
-        super$cassette$cassette_opts
+    on_stubbed_by_vcr_request = function(vcr_response) {
+      if (is.null(vcr_response$body)) {
+        body <- raw()
+      } else if (is.raw(vcr_response$body)) {
+        body <- vcr_response$body
+      } else {
+        body <- charToRaw(vcr_response$body)
+      }
+
+      httr2::response(
+        status_code = vcr_response$status,
+        url = self$request_original$url,
+        method = httr2_method(self$request_original),
+        headers = vcr_response$headers,
+        body = body
       )
     },
 
-    # these will replace those in
-    on_ignored_request = function(request) {
-      # perform and return REAL http response
-      # * make real request
-      # * run through response_for() to make vcr response, store vcr response
-      # * give back real response
+    on_recordable_request = function() {
+      if (!cassette_active()) {
+        cli::cli_abort("No cassette in use.")
+      }
+      httr2::local_mocked_responses(NULL)
 
-      # real request
-      webmockr::httr2_mock(FALSE)
-      on.exit(webmockr::httr2_mock(TRUE), add = TRUE)
-      tmp2 <- httr2::req_perform(request)
+      req <- self$request_original
+      req <- httr2::req_error(req, is_error = \(resp) FALSE)
+      response <- httr2::req_perform(req)
 
-      # run through response_for()
-      self$vcr_response <- private$response_for(tmp2)
+      if (!httr2::resp_has_body(response)) {
+        body <- NULL
+      } else if (has_text_content(response$headers)) {
+        body <- httr2::resp_body_string(response)
+      } else {
+        body <- httr2::resp_body_raw(response)
+      }
+      vcr_response <- vcr_response(
+        status = response$status_code,
+        headers = response$headers,
+        body = body,
+        # Saving body in separate file not currently supported for httr2
+        disk = FALSE
+      )
 
-      # return real response
-      return(response)
-    },
-
-    on_stubbed_by_vcr_request = function(request) {
-      # print("------- on_stubbed_by_vcr_request -------")
-      # return stubbed vcr response - no real response to do
-      serialize_to_httr2(request, super$get_stubbed_response(request))
-    },
-
-    on_recordable_request = function(request) {
-      # print("------- on_recordable_request -------")
-      # do real request - then stub response - then return stubbed vcr response
-      # real request
-      webmockr::httr2_mock(FALSE)
-      on.exit(webmockr::httr2_mock(TRUE), add = TRUE)
-      xx <- self$request_original %>% 
-        httr2::req_error(is_error = function(resp) FALSE)
-      # print(xx)
-      tryCatch(httr2::req_perform(xx), error = function(e) e)
-      tmp2 <- httr2::last_response()
-      # print("------- after the req_perform -------")
-
-      response <- webmockr::build_httr2_response(self$request_original, tmp2)
-
-      # make vcr response | then record interaction
-      self$vcr_response <- private$response_for(response)
-      cas <- tryCatch(current_cassette(), error = function(e) e)
-      if (inherits(cas, "error")) stop("no cassette in use")
-      response$request <- self$request_original
-      response$request$method <- webmockr:::req_method_get_w(response$request)
-      cas$record_http_interaction(response)
-
-      # return real response
-      # print("------- before return -------")
-      return(response)
+      current_cassette()$record_http_interaction(self$request, vcr_response)
+      response
     }
   )
 )
 
+httr2_method <- function(req) {
+  if (modern_httr2()) {
+    return(getNamespace("httr2")$req_get_method(req))
+  }
+
+  if (!is.null(req$method)) {
+    req$method
+  } else if ("nobody" %in% names(req$options)) {
+    "HEAD"
+  } else if (!is.null(req$body)) {
+    "POST"
+  } else {
+    "GET"
+  }
+}
+
+httr2_headers <- function(req) {
+  if (modern_httr2()) {
+    getNamespace("httr2")$req_get_headers(req)
+  } else {
+    req$headers
+  }
+}
+
+httr2_body <- function(x) {
+  if (modern_httr2()) {
+    type <- getNamespace("httr2")$req_get_body_type(x)
+    data <- getNamespace("httr2")$req_get_body(x)
+  } else {
+    type <- x$body$type %||% "empty"
+    data <- x$body$data
+  }
+  switch(
+    type,
+    # old & new
+    empty = NULL,
+    # old & new, but old can be string or raw
+    raw = {
+      if (is.raw(data) && has_text_content(x$headers)) {
+        rawToChar(data)
+      } else {
+        data
+      }
+    },
+    # new
+    string = data,
+    # old and new
+    form = list2str(data),
+    # old and new
+    json = unclass(rlang::exec(jsonlite::toJSON, data, !!!x$body$params)),
+    # old
+    # FIXME: for now take the file path - would be good to get what would
+    # be sent in a real request
+    "raw-file" = unclass(data),
+    # new
+    file = unclass(data),
+    # old and new
+    multipart = data,
+    cli::cli_abort("Unsupported request body type {.str {type}}.")
+  )
+}
+
+modern_httr2 <- function() {
+  exists("req_get_body", asNamespace("httr2"))
+}
+
+list2str <- function(w) {
+  # TODO: replace with url_query_build() once we depend on modern httr2
+  paste(names(w), unlist(unname(w)), sep = "=", collapse = "&")
+}

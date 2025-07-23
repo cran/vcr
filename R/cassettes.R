@@ -1,33 +1,103 @@
+#' Manually insert and eject a cassette
+#'
+#' Generally you should not need to use these functions, instead preferring
+#' [use_cassette()] or [local_cassette()]
+#'
+#' @export
+#' @inheritParams use_cassette
+#' @return A [Cassette], invisibly.
+#' @keywords internal
+#' @examples
+#' vcr_configure(dir = tempdir())
+#'
+#' insert_cassette("hello")
+#' current_cassette()
+#'
+#' eject_cassette()
+#' current_cassette()
+insert_cassette <- function(
+  name,
+  dir = NULL,
+  record = NULL,
+  match_requests_on = NULL,
+  serialize_with = NULL,
+  preserve_exact_body_bytes = NULL,
+  re_record_interval = NULL,
+  warn_on_empty = NULL
+) {
+  if (vcr_turned_off()) {
+    return(invisible())
+  }
+  enable_mocks()
+
+  # make cassette
+  cassette <- Cassette$new(
+    name,
+    dir = dir,
+    record = record,
+    match_requests_on = match_requests_on,
+    serialize_with = serialize_with,
+    preserve_exact_body_bytes = preserve_exact_body_bytes,
+    re_record_interval = re_record_interval,
+    warn_on_empty = warn_on_empty
+  )
+  cassette_push(cassette)
+  # $insert() might error if there's a bug in the decoder, so we need to
+  # make sure to unload it. We can't call `cassette_push()` after `$insert()`
+  # because the active cassette name is used for logging.
+  withCallingHandlers(
+    cassette$insert(),
+    error = function(e) cassette_pop()
+  )
+
+  invisible(cassette)
+}
+
+#' @export
+#' @rdname insert_cassette
+eject_cassette <- function() {
+  if (!cassette_active()) {
+    cli::cli_abort("No cassette in use.")
+  }
+
+  cassette_peek()$eject()
+  cassette <- cassette_pop()
+  if (!cassette_active()) {
+    disable_mocks()
+  }
+
+  invisible(cassette)
+}
+
 #' List cassettes, get current cassette, etc.
 #'
 #' @export
-#' @param on_disk (logical) Check for cassettes on disk + cassettes in session
-#' (`TRUE`), or check for only cassettes in session (`FALSE`). Default: `TRUE`
-#' @param verb (logical) verbose messages
 #' @details
 #'
-#' - `cassettes()`: returns cassettes found in your R session, you can toggle
-#' whether we pull from those on disk or not
-#' - `current_cassette()`: returns an empty list when no cassettes are in use,
-#' while it returns the current cassette (a `Cassette` object) when one is
-#' in use
-#' - `cassette_path()`: just gives you the current directory path where
-#' cassettes will be stored
+#' - `cassettes()`: returns all active cassettes in the current
+#'   session.
+#' - `current_cassette()`: returns `NULL` when no cassettes are in use;
+#' returns the current cassette (a `Cassette` object) when one is in use
+#' - `currrent_cassette_recording()` and `current_cassette_replaying()`:
+#'   tell you if the current cassette is recording and/or replaying. They
+#'   both return `FALSE` if there is no cassette in use.
+#' - `cassette_path()`: returns the current directory path where cassettes
+#' will be stored
 #'
 #' @examples
 #' vcr_configure(dir = tempdir())
 #'
 #' # list all cassettes
 #' cassettes()
-#' cassettes(on_disk = FALSE)
 #'
 #' # list the currently active cassette
 #' insert_cassette("stuffthings")
 #' current_cassette()
-#' eject_cassette()
-#'
 #' cassettes()
-#' cassettes(on_disk = FALSE)
+#'
+#' eject_cassette()
+#' cassettes()
+#'
 #'
 #' # list the path to cassettes
 #' cassette_path()
@@ -35,100 +105,69 @@
 #' cassette_path()
 #'
 #' vcr_configure_reset()
-cassettes <- function(on_disk = TRUE, verb = FALSE){
-  # combine cassettes on disk with cassettes in session
-  if (on_disk) {
-    out <- unlist(list(
-      lapply(get_cassette_data_paths(), read_cassette_meta, verbose = verb),
-      cassettes_session()
-    ), FALSE)
-    out[!duplicated(names(out))]
-  } else {
-    cassettes_session()
-  }
-}
-
-#' @export
-#' @rdname cassettes
-current_cassette <- function() {
-  tmp <- last(cassettes(FALSE))
-  if (length(tmp) == 0) return(list())
-  tmp <- if (length(tmp) == 1) tmp[[1]] else tmp
-  return(tmp)
-}
-
-#' @export
-#' @rdname cassettes
-cassette_path <- function() vcr_c$dir
-
-cassette_exists <- function(x) x %in% get_cassette_names()
-
-read_cassette_meta <- function(x, verbose = TRUE, ...){
-  tmp <- yaml::yaml.load_file(x, ...)
-  if (!inherits(tmp, "list") | !"http_interactions" %in% names(tmp)) {
-    if (verbose) message(x, " not found, missing data, or malformed")
-    return(list())
-  } else {
-    structure(tmp$http_interactions[[1]], class = "cassette")
-  }
-}
-
-get_cassette_meta_paths <- function(){
-  metafiles <- names(grep("metadata", vapply(cassette_files(), basename, ""),
-    value = TRUE))
-  as.list(stats::setNames(metafiles, unname(sapply(metafiles, function(x)
-    yaml::yaml.load_file(x)$name))))
-}
-
-cassette_files <- function(){
-  path <- path.expand(cassette_path())
-  check_create_path(path)
-  list.files(path, full.names = TRUE)
-}
-
-get_cassette_path <- function(x){
-  if ( x %in% get_cassette_names() ) get_cassette_data_paths()[[x]]
-}
-
-is_path <- function(x) file.exists(path.expand(x))
-
-get_cassette_names <- function(){
-  tmp <- vcr_files()
-  if (length(tmp) == 0) return("")
-  sub("\\.yml|\\.yaml|\\.json", "", basename(tmp))
-}
-
-vcr_files <- function() {
-  # remove some file types
-  files <- names(grep("metadata|rs-graphics|_pkgdown|travis|appveyor",
-    vapply(cassette_files(), basename, ""),
-    invert = TRUE, value = TRUE))
-  # include only certain file types
-  tokeep <- switch(vcr_c$serialize_with, yaml = "yml|yaml", json = "json")
-  names(grep(tokeep, vapply(cassette_files(), basename, ""),
-    value = TRUE))
-}
-
-get_cassette_data_paths <- function() {
-  files <- vcr_files()
-  if (length(files) == 0) return(list())
-  as.list(stats::setNames(files, get_cassette_names()))
-}
-
-check_create_path <- function(x){
-  if (file.exists(x)) dir.create(x, recursive = TRUE, showWarnings = FALSE)
-}
-
-cassettes_session <- function(x) {
-  xx <- ls(envir = vcr_cassettes)
-  if (length(xx) > 0) {
-    stats::setNames(lapply(xx, get, envir = vcr_cassettes), xx)
+cassettes <- function() {
+  if (cassette_active()) {
+    the$cassettes
   } else {
     list()
   }
 }
 
-include_cassette <- function(cassette) {
-  # assign cassette to bucket of cassettes in session
-  assign(cassette$name, cassette, envir = vcr_cassettes)
+cassette_names <- function() {
+  vapply(cassettes(), function(x) x$name, character(1))
+}
+
+#' @export
+#' @rdname cassettes
+current_cassette <- function() {
+  if (cassette_active()) {
+    n <- length(the$cassettes)
+    the$cassettes[[n]]
+  } else {
+    NULL
+  }
+}
+
+#' @export
+#' @rdname cassettes
+current_cassette_recording <- function() {
+  if (cassette_active()) {
+    current_cassette()$recording()
+  } else {
+    FALSE
+  }
+}
+
+#' @export
+#' @rdname cassettes
+current_cassette_replaying <- function() {
+  if (cassette_active()) {
+    current_cassette()$replaying()
+  } else {
+    FALSE
+  }
+}
+
+#' @export
+#' @rdname cassettes
+cassette_path <- function() the$config$dir
+
+cassette_push <- function(cassette) {
+  n <- length(the$cassettes)
+  the$cassettes[[n + 1]] <- cassette
+  invisible(cassette)
+}
+cassette_pop <- function() {
+  n <- length(the$cassettes)
+  cassette <- the$cassettes[[n]]
+  the$cassettes <- the$cassettes[-n]
+
+  cassette
+}
+cassette_peek <- function() {
+  n <- length(the$cassettes)
+  the$cassettes[[n]]
+}
+cassette_active <- function() {
+  length(the$cassettes) > 0
 }

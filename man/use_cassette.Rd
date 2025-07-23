@@ -2,196 +2,112 @@
 % Please edit documentation in R/use_cassette.R
 \name{use_cassette}
 \alias{use_cassette}
+\alias{local_cassette}
 \title{Use a cassette to record HTTP requests}
 \usage{
 use_cassette(
   name,
   ...,
+  dir = NULL,
   record = NULL,
   match_requests_on = NULL,
-  update_content_length_header = FALSE,
-  allow_playback_repeats = FALSE,
   serialize_with = NULL,
-  persist_with = NULL,
   preserve_exact_body_bytes = NULL,
   re_record_interval = NULL,
-  clean_outdated_http_interactions = NULL
+  warn_on_empty = NULL
+)
+
+local_cassette(
+  name,
+  dir = NULL,
+  record = NULL,
+  match_requests_on = NULL,
+  serialize_with = NULL,
+  preserve_exact_body_bytes = NULL,
+  re_record_interval = NULL,
+  warn_on_empty = NULL,
+  frame = parent.frame()
 )
 }
 \arguments{
-\item{name}{The name of the cassette. vcr will check this to ensure it
-is a valid file name. Not allowed: spaces, file extensions, control
-characters (e.g., \verb{\\n}), illegal characters ('/', '?', '<', '>', '\\', ':',
-'*', '|', and '\"'), dots alone (e.g., '.', '..'), Windows reserved
-words (e.g., 'com1'), trailing dots (can cause problems on Windows),
-names longer than 255 characters. See section "Cassette names"}
+\item{name}{The name of the cassette. This is used to name a file on
+disk, so it must be valid file name.}
 
 \item{...}{a block of code containing one or more requests (required). Use
 curly braces to encapsulate multi-line code blocks. If you can't pass a code
 block use \code{\link[=insert_cassette]{insert_cassette()}} instead.}
 
-\item{record}{The record mode (default: \code{"once"}). See \link{recording} for a
-complete list of the different recording modes.}
+\item{dir}{The directory where the cassette will be stored. Defaults to
+\code{test_path("_vcr")}.}
 
-\item{match_requests_on}{List of request matchers
-to use to determine what recorded HTTP interaction to replay. Defaults to
-\verb{["method", "uri"]}. The built-in matchers are "method", "uri", "host",
-"path", "headers", "body" and "query"}
+\item{record}{Record mode that dictates how HTTP requests/responses are
+recorded. Possible values are:
+\itemize{
+\item \strong{once}, the default: Replays recorded interactions, records new ones
+if no cassette exists, and errors on new requests if cassette exists.
+\item \strong{none}: Replays recorded interactions, and errors on any new requests.
+Guarantees that no HTTP requests occur.
+\item \strong{new_episodes}: Replays recorded interactions and always records new
+ones, even if similar interactions exist.
+\item \strong{all}: Never replays recorded interactions, always recording new.
+Useful for re-recording outdated responses or logging all HTTP requests.
+}}
 
-\item{update_content_length_header}{(logical) Whether or
-not to overwrite the \code{Content-Length} header of the responses to
-match the length of the response body. Default: \code{FALSE}}
+\item{match_requests_on}{Character vector of request matchers used to
+determine which recorded HTTP interaction to replay. The default matches
+on the \code{"method"}, \code{"uri"}, and either \code{"body"} (if present)
+or \code{"body_json"} (if the content-type is \code{application/json}).
 
-\item{allow_playback_repeats}{(logical) Whether or not to
-allow a single HTTP interaction to be played back multiple times.
-Default: \code{FALSE}.}
+The full set of possible values are:
+\itemize{
+\item \code{method}: the HTTP method.
+\item \code{uri}: the complete request URI, excluding the port.
+\item \code{uri_with_port}: the complete request URI, including the port.
+\item \code{host}: the \strong{host} component of the URI.
+\item \code{path}: the \strong{path} component of the URI.
+\item \code{query}: the \strong{query} component of the URI.
+\item \code{body}: the request body.
+\item \code{body_json}: the request body, parsed as JSON.
+\item \code{header}: all request headers.
+}
 
-\item{serialize_with}{(character) Which serializer to use.
-Valid values are "yaml" (default) and "json". Note that you can have
-multiple cassettes with the same name as long as they use different
-serializers; so if you only want one cassette for a given cassette name,
-make sure to not switch serializers, or clean up files you no longer need.}
+If more than one is specified, all components must match in order for the
+request to match. If not supplied, defaults to \code{c("method", "uri")}.
 
-\item{persist_with}{(character) Which cassette persister to
-use. Default: "file_system". You can also register and use a
-custom persister.}
+Note that the request header and body will only be included in the
+cassette if  \code{match_requests_on} includes "header" or "body" respectively.
+This keeps the recorded request as lightweight as possible.}
 
-\item{preserve_exact_body_bytes}{(logical) Whether or not
-to base64 encode the bytes of the requests and responses for
-this cassette when serializing it. See also \code{preserve_exact_body_bytes}
-in \code{\link[=vcr_configure]{vcr_configure()}}. Default: \code{FALSE}}
+\item{serialize_with}{(string) Which serializer to use:
+\code{"yaml"} (the default), \code{"json"}, or \code{"qs2"}.}
+
+\item{preserve_exact_body_bytes}{(logical) Force a binary (base64)
+representation of the request and response bodies? By default, vcr
+will look at the \code{Content-Type} header to determine if this is necessary,
+but if it doesn't work you can set \code{preserve_exact_body_bytes = TRUE} to
+force it.}
 
 \item{re_record_interval}{(integer) How frequently (in seconds) the
-cassette should be re-recorded. default: \code{NULL} (not re-recorded)}
+cassette should be re-recorded. Default: \code{NULL} (not re-recorded).}
 
-\item{clean_outdated_http_interactions}{(logical) Should outdated
-interactions be recorded back to file? default: \code{FALSE}}
-}
-\value{
-an object of class \code{Cassette}
+\item{warn_on_empty}{(logical) Warn if the cassette is ejected but no interactions
+have been recorded. Default: \code{NULL} (inherits from global configuration).}
+
+\item{frame}{Attach exit handlers to this environment. Typically, this
+should be either the current environment or a parent frame (accessed
+through \code{\link[=parent.frame]{parent.frame()}}). See \code{vignette("withr", package = "withr")}
+for more details.}
 }
 \description{
-Use a cassette to record HTTP requests
-}
-\details{
-A run down of the family of top level \pkg{vcr} functions
-\itemize{
-\item \code{use_cassette} Initializes a cassette. Returns the inserted
-cassette.
-\item \code{insert_cassette} Internally used within \code{use_cassette}
-\item \code{eject_cassette} ejects the current cassette. The cassette
-will no longer be used. In addition, any newly recorded HTTP interactions
-will be written to disk.
-}
-}
-\section{Cassette options}{
+\code{use_cassette(...)} uses a cassette for the code in \code{...};
+\code{local_cassette()} uses a cassette for the current function scope (e.g.
+for one test). Learn more in \code{vignette("vcr")}.
 
-
-Default values for arguments controlling cassette behavior are
-inherited from vcr's global configuration. See \code{\link[=vcr_configure]{vcr_configure()}} for a
-complete list of options and their default settings. You can override these
-options for a specific cassette by changing an argument's value to something
-other than \code{NULL} when calling either \code{insert_cassette()} or
-\code{use_cassette()}.
-}
-
-\section{Behavior}{
-
-This function handles a few different scenarios:
-\itemize{
-\item when everything runs smoothly, and we return a \code{Cassette} class object
-so you can inspect the cassette, and the cassette is ejected
-\item when there is an invalid parameter input on cassette creation,
-we fail with a useful message, we don't return a cassette, and the
-cassette is ejected
-\item when there is an error in calling your passed in code block,
-we return with a useful message, and since we use \code{on.exit()}
-the cassette is still ejected even though there was an error,
-but you don't get an object back
-\item whenever an empty cassette (a yml/json file) is found, we delete it
-before returning from the \code{use_cassette()} function call. we achieve
-this via use of \code{on.exit()} so an empty cassette is deleted even
-if there was an error in the code block you passed in
-}
-}
-
-\section{Cassettes on disk}{
-
-Note that \emph{"eject"} only means that the R session cassette is no longer
-in use. If any interactions were recorded to disk, then there is a file
-on disk with those interactions.
-}
-
-\section{Using with tests (specifically \pkg{testthat})}{
-
-There's a few ways to get correct line numbers for failed tests and
-one way to not get correct line numbers:
-
-\emph{Correct}: Either wrap your \code{test_that()} block inside your \code{use_cassette()}
-block, OR if you put your \code{use_cassette()} block inside your \code{test_that()}
-block put your \code{testthat} expectations outside of the \code{use_cassette()}
-block.
-
-\emph{Incorrect}: By wrapping the \code{use_cassette()} block inside your
-\code{test_that()} block with your \pkg{testthat} expectations inside the
-\code{use_cassette()} block, you'll only get the line number that the
-\code{use_cassette()} block starts on.
-}
-
-\examples{
-\dontrun{
-library(vcr)
-library(crul)
-vcr_configure(dir = tempdir())
-
-use_cassette(name = "apple7", {
-  cli <- HttpClient$new(url = "https://hb.opencpu.org")
-  resp <- cli$get("get")
-})
-readLines(file.path(tempdir(), "apple7.yml"))
-
-# preserve exact body bytes - records in base64 encoding
-use_cassette("things4", {
-  cli <- crul::HttpClient$new(url = "https://hb.opencpu.org")
-  bbb <- cli$get("get")
-}, preserve_exact_body_bytes = TRUE)
-## see the body string value in the output here
-readLines(file.path(tempdir(), "things4.yml"))
-
-# cleanup
-unlink(file.path(tempdir(), c("things4.yml", "apple7.yml")))
-
-
-# with httr
-library(vcr)
-library(httr)
-vcr_configure(dir = tempdir(), log = TRUE, log_opts = list(file = file.path(tempdir(), "vcr.log")))
-
-use_cassette(name = "stuff350", {
-  res <- GET("https://hb.opencpu.org/get")
-})
-readLines(file.path(tempdir(), "stuff350.yml"))
-
-use_cassette(name = "catfact456", {
-  res <- GET("https://catfact.ninja/fact")
-})
-
-# record mode: none
-library(crul)
-vcr_configure(dir = tempdir())
-
-## make a connection first
-conn <- crul::HttpClient$new("https://eu.httpbin.org")
-## this errors because 'none' disallows any new requests
-# use_cassette("none_eg", (res2 <- conn$get("get")), record = "none")
-## first use record mode 'once' to record to a cassette
-one <- use_cassette("none_eg", (res <- conn$get("get")), record = "once")
-one; res
-## then use record mode 'none' to see it's behavior
-two <- use_cassette("none_eg", (res2 <- conn$get("get")), record = "none")
-two; res2
-}
+Note that defaults for most arguments are controlled by \code{\link[=vcr_configure]{vcr_configure()}},
+so you may want to use that instead if you are changing the defaults for
+all cassettes.
 }
 \seealso{
-\code{\link[=insert_cassette]{insert_cassette()}}, \code{\link[=eject_cassette]{eject_cassette()}}
+\code{\link[=insert_cassette]{insert_cassette()}} and \code{\link[=eject_cassette]{eject_cassette()}} for the underlying
+functions.
 }

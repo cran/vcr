@@ -1,70 +1,145 @@
-#' Serializer class - base class for JSON/YAML serializers
-#' @keywords internal
-Serializer <- R6::R6Class("Serializer",
+serializer_fetch <- function(type, path, name, ...) {
+  switch(
+    type,
+    json = JSON$new(path, name, ...),
+    yaml = YAML$new(path, name, ...),
+    qs2 = QS2$new(path, name, ...),
+    cli::cli_abort("Unsupported cassette serializer {.str {type}}.")
+  )
+}
+
+Serializer <- R6::R6Class(
+  "Serializer",
   public = list(
-    #' @field file_extension (character) A file extension
     file_extension = NULL,
-    #' @field path (character) full path to the yaml file
     path = NULL,
+    preserve_bytes = FALSE,
+    matchers = character(),
 
-    #' @description Create a new YAML object
-    #' @param file_extension (character) A file extension
-    #' @param path (character) path to the cassette, excluding the cassette
-    #' directory and the file extension
-    #' @return A new `YAML` object
-    initialize = function(file_extension = NULL, path = NULL) {
-      self$file_extension <- file_extension
-      if (is.null(path)) {
-        self$path <- paste0(cassette_path(), "/", basename(tempfile()), self$file_extension)
-      } else {
-        self$path <- paste0(cassette_path(), "/", path, self$file_extension)
-      }
+    initialize = function(
+      path,
+      name,
+      ext,
+      preserve_bytes = FALSE,
+      matchers = c("method", "uri")
+    ) {
+      self$file_extension <- ext
+      self$path <- paste0(path, "/", name, self$file_extension)
+      self$preserve_bytes = preserve_bytes
+      self$matchers <- matchers
     },
-    #' @description Serializes a hash - REPLACED BY YAML/JSON METHODS
-    #' @param x (list) the object to serialize
-    #' @param path (character) the file path
-    #' @param bytes (logical) whether to preserve exact body bytes or not
-    #' @return (character) the YAML or JSON string to write to disk
-    serialize = function(x, path, bytes) {},
-    #' @description Serializes a file - REPLACED BY YAML/JSON METHODS
-    deserialize = function() {}
-  ),
-  private = list(
-    strip_newlines = function(x) {
-      if (!inherits(x, "character")) return(x)
-      gsub("[\r\n]", "", x)
+    serialize = function(data) NULL,
+    deserialize = function() NULL
+  )
+)
+
+JSON <- R6::R6Class(
+  "JSON",
+  inherit = Serializer,
+  public = list(
+    initialize = function(
+      path,
+      name,
+      preserve_bytes = FALSE,
+      matchers = c("method", "uri")
+    ) {
+      super$initialize(
+        path,
+        name,
+        ".json",
+        preserve_bytes = preserve_bytes,
+        matchers = matchers
+      )
     },
-    process_body = function(x, cassette) {
-      if (is.null(x)) {
-        return(list())
-      } else {
-        # check for base64 encoding
-        x$http_interactions <- lapply(x$http_interactions, function(z) {
-          if (is_base64(z$response$body, cassette)) {
-            # string or base64_string?
-            str_slots <- c('string', 'base64_string')
-            slot <- str_slots[str_slots %in% names(z$response$body)]
 
-            # if character and newlines detected, remove newlines
-            z$response$body[[slot]] <- private$strip_newlines(z$response$body[[slot]])
-            b64dec <- base64enc::base64decode(z$response$body[[slot]])
-            b64dec_r2c <- tryCatch(rawToChar(b64dec), error = function(e) e)
-            z$response$body[[slot]] <- if (inherits(b64dec_r2c, "error")) {
-              # probably is binary (e.g., pdf), so can't be converted to char.
-              b64dec
-            } else {
-              # probably was originally character data, so 
-              #  can convert to character from binary
-              b64dec_r2c
-            }
+    serialize = function(data) {
+      out <- encode_interactions(
+        data,
+        preserve_bytes = self$preserve_bytes,
+        matchers = self$matchers
+      )
+      jsonlite::write_json(
+        out,
+        self$path,
+        auto_unbox = TRUE,
+        pretty = the$config$json_pretty
+      )
+    },
 
-            # set encoding to empty string, we're ignoring it for now
-            z$response$body$encoding <- ""
-          }
-          return(z)
-        })
-        return(x)
-      }
+    deserialize = function() {
+      input <- jsonlite::read_json(self$path)
+      decode_interactions(input, self$preserve_bytes)
+    }
+  )
+)
+
+YAML <- R6::R6Class(
+  "YAML",
+  inherit = Serializer,
+  public = list(
+    initialize = function(
+      path,
+      name,
+      preserve_bytes = FALSE,
+      matchers = c("method", "uri")
+    ) {
+      super$initialize(
+        path,
+        name,
+        ".yml",
+        preserve_bytes = preserve_bytes,
+        matchers = matchers
+      )
+    },
+
+    serialize = function(data) {
+      out <- encode_interactions(
+        data,
+        preserve_bytes = self$preserve_bytes,
+        matchers = self$matchers
+      )
+      yaml::write_yaml(out, self$path)
+    },
+
+    deserialize = function() {
+      input <- yaml::read_yaml(self$path)
+      decode_interactions(input, self$preserve_bytes)
+    }
+  )
+)
+
+QS2 <- R6::R6Class(
+  "QS2",
+  inherit = Serializer,
+  public = list(
+    initialize = function(
+      path,
+      name,
+      preserve_bytes = FALSE,
+      matchers = c("method", "uri")
+    ) {
+      check_installed("qs2")
+      super$initialize(
+        path,
+        name,
+        ".qs2",
+        preserve_bytes = preserve_bytes,
+        matchers = matchers
+      )
+    },
+
+    serialize = function(data) {
+      out <- encode_interactions(
+        data,
+        preserve_bytes = self$preserve_bytes,
+        matchers = self$matchers
+      )
+      qs2::qs_save(object = out, file = self$path)
+    },
+
+    deserialize = function() {
+      input <- qs2::qs_read(file = self$path)
+      decode_interactions(input, self$preserve_bytes)
     }
   )
 )

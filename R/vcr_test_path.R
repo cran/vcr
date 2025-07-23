@@ -5,8 +5,8 @@
 #'
 #' @note `vcr_test_path()` assumes you are using testthat for your unit tests.
 #'
-#' @param ...	Character vectors giving path component. each character string
-#' gets added on to the path, e.g., `vcr_test_path("a", "b")` becomes
+#' @param ... Character vectors giving path components. Each character string
+#' gets added to the path, e.g., `vcr_test_path("a", "b")` becomes
 #' `tests/a/b` relative to the root of the package.
 #'
 #' @return A character vector giving the path
@@ -16,15 +16,19 @@
 #' vcr_test_path("fixtures")
 #' }
 vcr_test_path <- function(...) {
-  if (missing(...)) stop("Please provide a directory name.")
-  if (any(!nzchar(...))) stop("Please use non empty path elements.")
+  if (missing(...)) {
+    stop("Please provide a directory name.")
+  }
+  if (any(!nzchar(...))) {
+    stop("Please use non empty path elements.")
+  }
 
   # dirname () moves up one level from testthat dir
   root <- dirname(rprojroot::find_testthat_root_file())
   path <- file.path(root, ...)
-  if (!dir.exists(path)){
+  if (!dir.exists(path)) {
     message("could not find ", path, "; creating it")
-    dir.create(path)
+    dir_create(path)
   }
   path
 }
