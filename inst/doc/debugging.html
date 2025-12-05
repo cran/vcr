@@ -373,7 +373,7 @@ what happens the first time you make a request:</p>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>})</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Inserting &#39;debugging-1.yml&#39; (new cassette)</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Mode: recording</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: GET http://127.0.0.1:57449/get</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: GET http://127.0.0.1:57451/get</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Recording response: 200 with 270 bytes of application/json data</span></span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Ejecting</span></span></code></pre></div>
 <ol style="list-style-type: decimal">
@@ -394,7 +394,7 @@ recorded to disk.</li>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>})</span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Inserting &#39;debugging-1.yml&#39; (with 1 interactions)</span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Mode: replaying</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: GET http://127.0.0.1:57449/get</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: GET http://127.0.0.1:57451/get</span></span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Looking for existing requests using method/uri</span></span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]     Request 1: MATCH</span></span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Replaying response 1</span></span>
@@ -422,7 +422,7 @@ We’ll leave everything the same but change the method to
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>})</span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Inserting &#39;debugging-1.yml&#39; (with 1 interactions)</span></span>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Mode: replaying</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: POST http://127.0.0.1:57449/get</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: POST http://127.0.0.1:57451/get</span></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Looking for existing requests using method/uri</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]     Request 1: NO MATCH</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]       `matching$method`: &quot;POST&quot;</span></span>
@@ -444,7 +444,7 @@ different method to the request we were trying to match.</p>
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>})</span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Inserting &#39;debugging-1.yml&#39; (with 1 interactions)</span></span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Mode: replaying</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: GET http://127.0.0.1:57449/set</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1] Handling request: GET http://127.0.0.1:57451/set</span></span>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]   Looking for existing requests using method/uri</span></span>
 <span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]     Request 1: NO MATCH</span></span>
 <span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-1]       `matching$uri$path`: &quot;/set&quot;</span></span>
@@ -471,11 +471,11 @@ we record multiple requests:</p>
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>})</span>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Inserting &#39;debugging-2.yml&#39; (new cassette)</span></span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]   Mode: recording</span></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57449/get?x=1</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57451/get?x=1</span></span>
 <span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]   Recording response: 200 with 286 bytes of application/json data</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57449/get?x=2</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57451/get?x=2</span></span>
 <span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]   Recording response: 200 with 286 bytes of application/json data</span></span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57449/get?x=3</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57451/get?x=3</span></span>
 <span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]   Recording response: 200 with 286 bytes of application/json data</span></span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Ejecting</span></span></code></pre></div>
 <p>Now if we deliberately change the url, you can see that it looks at
@@ -488,7 +488,7 @@ all three previously saved requests before giving up.</p>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>})</span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Inserting &#39;debugging-2.yml&#39; (with 3 interactions)</span></span>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]   Mode: replaying</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57449/get?x=4</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2] Handling request: GET http://127.0.0.1:57451/get?x=4</span></span>
 <span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]   Looking for existing requests using method/uri</span></span>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]     Request 1: NO MATCH</span></span>
 <span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: debugging-2]       `matching$uri$params$x`: &quot;4&quot;</span></span>
@@ -552,11 +552,11 @@ string used to ensure that every request is unique:</p>
 <span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>})</span>
 <span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic] Inserting &#39;nondeterministic.yml&#39; (with 1 interactions)</span></span>
 <span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]   Mode: replaying</span></span>
-<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic] Handling request: GET http://127.0.0.1:57449/get?nonce=kyzskunjwy</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic] Handling request: GET http://127.0.0.1:57451/get?nonce=ymniyvgmce</span></span>
 <span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]   Looking for existing requests using method/uri</span></span>
 <span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]     Request 1: NO MATCH</span></span>
-<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]       `matching$uri$params$nonce`: &quot;kyzskunjwy&quot;</span></span>
-<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]       `recorded$uri$params$nonce`: &quot;pbcmrffonv&quot;</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]       `matching$uri$params$nonce`: &quot;ymniyvgmce&quot;</span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]       `recorded$uri$params$nonce`: &quot;jlggdqspne&quot;</span></span>
 <span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]   No matching requests</span></span>
 <span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt; Error:</span></span>
 <span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt; ! Failed to find matching request in active cassette,</span></span>
@@ -575,7 +575,7 @@ matched.</p>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>})</span>
 <span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic] Inserting &#39;nondeterministic.yml&#39; (with 1 interactions)</span></span>
 <span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]   Mode: replaying</span></span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic] Handling request: GET http://127.0.0.1:57449/get?nonce=bfcldphlex</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic] Handling request: GET http://127.0.0.1:57451/get?nonce=qeskzbxoep</span></span>
 <span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]   Looking for existing requests using method/uri</span></span>
 <span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]     Request 1: MATCH</span></span>
 <span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; [Cassette: nondeterministic]   Replaying response 1</span></span>
